@@ -1,0 +1,4 @@
+version: '2'
+services:
+  kubectl:
+    image: registry.drycc.cc/drycc-addons/kubectl:1.27

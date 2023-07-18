@@ -1,0 +1,54 @@
+version: '2.1'
+
+services:
+  mariadb-master:
+    image: registry.drycc.cc/drycc-addons/mariadb:11.0
+    ports:
+      - '3306'
+    volumes:
+      - 'mariadb_master_data:/drycc/mariadb'
+    environment:
+      - DRYCC_DEBUG=true
+      - MARIADB_REPLICATION_MODE=master
+      - MARIADB_REPLICATION_USER=repl_user
+      - MARIADB_REPLICATION_PASSWORD=my_repl_passwd
+      - MARIADB_USER=my_user
+      - MARIADB_PASSWORD=my_passwd
+      - MARIADB_DATABASE=my_database
+      - MARIADB_ROOT_PASSWORD=my_root_password
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      # - ALLOW_EMPTY_PASSWORD=yes
+    healthcheck:
+      test: ['CMD', 'init-stack', '/opt/drycc/scripts/mariadb/healthcheck.sh']
+      interval: 15s
+      timeout: 5s
+      retries: 6
+
+  mariadb-slave:
+    image: registry.drycc.cc/drycc-addons/mariadb:11.0
+    ports:
+      - '3306'
+    depends_on:
+      - mariadb-master
+    environment:
+      - DRYCC_DEBUG=true
+      - MARIADB_REPLICATION_MODE=slave
+      - MARIADB_MASTER_ROOT_USER=root
+      - MARIADB_MASTER_ROOT_PASSWORD=my_root_password
+      - MARIADB_REPLICATION_USER=repl_user
+      - MARIADB_REPLICATION_PASSWORD=my_repl_passwd
+      - MARIADB_USER=my_user
+      - MARIADB_DATABASE=my_database
+      - MARIADB_MASTER_HOST=mariadb-master
+      - MARIADB_MASTER_PORT_NUMBER=3306
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      # - ALLOW_EMPTY_PASSWORD=yes
+    healthcheck:
+      test: ['CMD', 'init-stack', '/opt/drycc/scripts/mariadb/healthcheck.sh']
+      interval: 15s
+      timeout: 5s
+      retries: 6
+
+volumes:
+  mariadb_master_data:
+    driver: local

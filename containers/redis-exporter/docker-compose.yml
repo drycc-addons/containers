@@ -1,0 +1,5 @@
+version: '2'
+
+services:
+  redis-exporter:
+    image: registry.drycc.cc/drycc-addons/redis-exporter:1

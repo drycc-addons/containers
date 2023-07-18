@@ -1,0 +1,72 @@
+version: '2'
+services:
+  redis-node-0:
+    image: registry.drycc.cc/drycc-addons/redis-cluster:7.0
+    volumes:
+      - redis-cluster_data-0:/drycc/redis/data
+    environment:
+      - 'REDIS_PASSWORD=drycc'
+      - 'REDIS_NODES=redis-node-0 redis-node-1 redis-node-2 redis-node-3 redis-node-4 redis-node-5'
+
+  redis-node-1:
+    image: registry.drycc.cc/drycc-addons/redis-cluster:7.0
+    volumes:
+      - redis-cluster_data-1:/drycc/redis/data
+    environment:
+      - 'REDIS_PASSWORD=drycc'
+      - 'REDIS_NODES=redis-node-0 redis-node-1 redis-node-2 redis-node-3 redis-node-4 redis-node-5'
+
+  redis-node-2:
+    image: registry.drycc.cc/drycc-addons/redis-cluster:7.0
+    volumes:
+      - redis-cluster_data-2:/drycc/redis/data
+    environment:
+      - 'REDIS_PASSWORD=drycc'
+      - 'REDIS_NODES=redis-node-0 redis-node-1 redis-node-2 redis-node-3 redis-node-4 redis-node-5'
+
+  redis-node-3:
+    image: registry.drycc.cc/drycc-addons/redis-cluster:7.0
+    volumes:
+      - redis-cluster_data-3:/drycc/redis/data
+    environment:
+      - 'REDIS_PASSWORD=drycc'
+      - 'REDIS_NODES=redis-node-0 redis-node-1 redis-node-2 redis-node-3 redis-node-4 redis-node-5'
+
+  redis-node-4:
+    image: registry.drycc.cc/drycc-addons/redis-cluster:7.0
+    volumes:
+      - redis-cluster_data-4:/drycc/redis/data
+    environment:
+      - 'REDIS_PASSWORD=drycc'
+      - 'REDIS_NODES=redis-node-0 redis-node-1 redis-node-2 redis-node-3 redis-node-4 redis-node-5'
+
+  redis-node-5:
+    image: registry.drycc.cc/drycc-addons/redis-cluster:7.0
+    volumes:
+      - redis-cluster_data-5:/drycc/redis/data
+    depends_on:
+      - redis-node-0
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+      - redis-node-4
+    environment:
+      - 'REDIS_PASSWORD=drycc'
+      - 'REDISCLI_AUTH=drycc'
+      - 'REDIS_CLUSTER_REPLICAS=1'
+      - 'REDIS_NODES=redis-node-0 redis-node-1 redis-node-2 redis-node-3 redis-node-4 redis-node-5'
+      - 'REDIS_CLUSTER_CREATOR=yes'
+
+volumes:
+  redis-cluster_data-0:
+    driver: local
+  redis-cluster_data-1:
+    driver: local
+  redis-cluster_data-2:
+    driver: local
+  redis-cluster_data-3:
+    driver: local
+  redis-cluster_data-4:
+    driver: local
+  redis-cluster_data-5:
+    driver: local

@@ -1,0 +1,29 @@
+platform: linux/amd64
+
+clone:
+  git:
+    image: docker.io/woodpeckerci/plugin-git:2.0.3
+    settings:
+      partial: false
+      depth: 2
+
+labels:
+  type: exec
+
+pipeline:
+- name: publish-linux
+  image: bash
+  commands:
+  - echo $CONTAINER_PASSWORD | docker login $DRYCC_REGISTRY --username $CONTAINER_USERNAME --password-stdin > /dev/null 2>&1
+  - bash _scripts/build.sh manifest
+  secrets:
+  - dev_registry
+  - drycc_registry
+  - container_username
+  - container_password
+  when:
+    event:
+    - push
+
+depends_on:
+- build-linux

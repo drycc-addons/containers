@@ -1,0 +1,5 @@
+version: '2'
+
+services:
+  minio-client:
+    image: registry.drycc.cc/drycc-addons/minio-client:2023

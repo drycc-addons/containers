@@ -1,0 +1,5 @@
+version: '2'
+
+services:
+  postgres-exporter:
+    image: registry.drycc.cc/drycc-addons/postgres-exporter:0
