@@ -10,10 +10,13 @@ build() {
         project=$(echo $container | awk -F '/' '{print $1}')
         version=$(echo $container | awk -F '/' '{print $2}')
         image=$DRYCC_REGISTRY/$IMAGE_PREFIX/$project:$version-linux-$(dpkg --print-architecture)
-        cd $BASE_DIR/containers/$project/$version
-        docker build --build-arg CODENAME=$codename . -t $image
-        docker push $image
-        cd -
+        project_dir=$BASE_DIR/containers/$project/$version
+        if [ -d "$project_dir" ]; then
+            cd $project_dir
+            docker build --build-arg CODENAME=$codename . -t $image
+            docker push $image
+            cd -
+        fi
     done
 }
 
@@ -22,16 +25,19 @@ manifest() {
     do
         project=$(echo $container | awk -F '/' '{print $1}')
         version=$(echo $container | awk -F '/' '{print $2}')
-        cp -rf .woodpecker/manifest.tmpl .woodpecker/manifest
-        sed -i "s/{{project}}/${project}/g" .woodpecker/manifest
-        sed -i "s/{{version}}/${version}/g" .woodpecker/manifest
-        docker run --rm \
-          -e PLUGIN_SPEC=.woodpecker/manifest \
-          -e PLUGIN_USERNAME=$CONTAINER_USERNAME \
-          -e PLUGIN_PASSWORD=$CONTAINER_PASSWORD \
-          -v $(pwd):$(pwd) \
-          -w $(pwd) \
-          plugins/manifest
+        project_dir=$BASE_DIR/containers/$project/$version
+        if [ -d "$project_dir" ]; then
+            cp -rf .woodpecker/manifest.tmpl .woodpecker/manifest
+            sed -i "s/{{project}}/${project}/g" .woodpecker/manifest
+            sed -i "s/{{version}}/${version}/g" .woodpecker/manifest
+            docker run --rm \
+            -e PLUGIN_SPEC=.woodpecker/manifest \
+            -e PLUGIN_USERNAME=$CONTAINER_USERNAME \
+            -e PLUGIN_PASSWORD=$CONTAINER_PASSWORD \
+            -v $(pwd):$(pwd) \
+            -w $(pwd) \
+            plugins/manifest
+        fi
     done
 }
 
