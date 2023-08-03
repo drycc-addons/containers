@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Bitnami Redis library
+# Drycc Redis library
 
 # shellcheck disable=SC1091
 

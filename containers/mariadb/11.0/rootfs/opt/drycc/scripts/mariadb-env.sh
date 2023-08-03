@@ -3,8 +3,8 @@
 # Environment configuration for mariadb
 
 # The values for all environment variables will be set in the below order of precedence
-# 1. Custom environment variables defined below after Bitnami defaults
-# 2. Constants defined in this file (environment variables with no default), i.e. BITNAMI_ROOT_DIR
+# 1. Custom environment variables defined below after drycc defaults
+# 2. Constants defined in this file (environment variables with no default), i.e. DRYCC_ROOT_DIR
 # 3. Environment variables overridden via external files using *_FILE variables (see below)
 # 4. Environment variables set externally (i.e. current Bash context/Dockerfile/userdata)
 
@@ -12,8 +12,8 @@
 # shellcheck disable=SC1090,SC1091
 . /opt/drycc/scripts/liblog.sh
 
-export BITNAMI_ROOT_DIR="/opt/drycc"
-export BITNAMI_VOLUME_DIR="/drycc"
+export DRYCC_ROOT_DIR="/opt/drycc"
+export DRYCC_VOLUME_DIR="/drycc"
 
 # Logging configuration
 export MODULE="${MODULE:-mariadb}"
@@ -67,8 +67,8 @@ unset mariadb_env_vars
 export DB_FLAVOR="mariadb"
 
 # Paths
-export DB_BASE_DIR="${BITNAMI_ROOT_DIR}/mariadb"
-export DB_VOLUME_DIR="${BITNAMI_VOLUME_DIR}/mariadb"
+export DB_BASE_DIR="${DRYCC_ROOT_DIR}/mariadb"
+export DB_VOLUME_DIR="${DRYCC_VOLUME_DIR}/mariadb"
 export DB_DATA_DIR="${DB_VOLUME_DIR}/data"
 export DB_BIN_DIR="${DB_BASE_DIR}/bin"
 export DB_SCRIPTS_DIR="${DB_BASE_DIR}/scripts"

@@ -4,7 +4,7 @@
 
 # The values for all environment variables will be set in the below order of precedence
 # 1. Custom environment variables defined below after Bitnami defaults
-# 2. Constants defined in this file (environment variables with no default), i.e. BITNAMI_ROOT_DIR
+# 2. Constants defined in this file (environment variables with no default), i.e. DRYCC_ROOT_DIR
 # 3. Environment variables overridden via external files using *_FILE variables (see below)
 # 4. Environment variables set externally (i.e. current Bash context/Dockerfile/userdata)
 
@@ -12,8 +12,8 @@
 # shellcheck disable=SC1090,SC1091
 . /opt/drycc/scripts/liblog.sh
 
-export BITNAMI_ROOT_DIR="/opt/drycc"
-export BITNAMI_VOLUME_DIR="/drycc"
+export DRYCC_ROOT_DIR="/opt/drycc"
+export DRYCC_VOLUME_DIR="/drycc"
 
 # Logging configuration
 export MODULE="${MODULE:-redis}"
@@ -66,7 +66,7 @@ unset redis_env_vars
 
 # Paths
 export REDIS_VOLUME_DIR="/drycc/redis"
-export REDIS_BASE_DIR="${BITNAMI_ROOT_DIR}/redis"
+export REDIS_BASE_DIR="${DRYCC_ROOT_DIR}/redis"
 export REDIS_CONF_DIR="${REDIS_BASE_DIR}/etc"
 export REDIS_DATA_DIR="${REDIS_DATA_DIR:-${REDIS_VOLUME_DIR}/data}"
 export REDIS_MOUNTED_CONF_DIR="${REDIS_BASE_DIR}/mounted-etc"
@@ -77,7 +77,7 @@ export REDIS_LOG_FILE="${REDIS_LOG_DIR}/redis.log"
 export REDIS_TMP_DIR="${REDIS_BASE_DIR}/tmp"
 export REDIS_PID_FILE="${REDIS_TMP_DIR}/redis.pid"
 export REDIS_BIN_DIR="${REDIS_BASE_DIR}/bin"
-export PATH="${REDIS_BIN_DIR}:${BITNAMI_ROOT_DIR}/common/bin:${PATH}"
+export PATH="${REDIS_BIN_DIR}:${DRYCC_ROOT_DIR}/common/bin:${PATH}"
 
 # System users (when running with a privileged user)
 export REDIS_DAEMON_USER="redis"

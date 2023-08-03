@@ -3,7 +3,7 @@
 # Environment configuration for redis-sentinel
 
 # The values for all environment variables will be set in the below order of precedence
-# 1. Custom environment variables defined below after Bitnami defaults
+# 1. Custom environment variables defined below after Drycc defaults
 # 2. Constants defined in this file (environment variables with no default), i.e. DRYCC_ROOT_DIR
 # 3. Environment variables overridden via external files using *_FILE variables (see below)
 # 4. Environment variables set externally (i.e. current Bash context/Dockerfile/userdata)

@@ -12,7 +12,6 @@ set -o pipefail
 
 # Load libraries
 . /opt/drycc/scripts/libredissentinel.sh
-. /opt/drycc/scripts/libbitnami.sh
 . /opt/drycc/scripts/liblog.sh
 
 # print_welcome_page

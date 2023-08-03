@@ -8,7 +8,6 @@ set -o pipefail
 # set -o xtrace # Uncomment this line for debugging purposes
 
 # Load libraries
-# . /opt/drycc/scripts/libbitnami.sh
 . /opt/drycc/scripts/libmariadb.sh
 
 # Load MariaDB environment variables

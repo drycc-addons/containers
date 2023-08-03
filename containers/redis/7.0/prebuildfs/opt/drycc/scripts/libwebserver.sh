@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Bitnami web server handler library
+# Drycc web server handler library
 
 # shellcheck disable=SC1090,SC1091
 
@@ -112,7 +112,7 @@ is_web_server_running() {
 #########################
 web_server_start() {
     info "Starting $(web_server_type) in background"
-    "${BITNAMI_ROOT_DIR}/scripts/$(web_server_type)/start.sh"
+    "${DRYCC_ROOT_DIR}/scripts/$(web_server_type)/start.sh"
 }
 
 ########################
@@ -126,7 +126,7 @@ web_server_start() {
 #########################
 web_server_stop() {
     info "Stopping $(web_server_type)"
-    "${BITNAMI_ROOT_DIR}/scripts/$(web_server_type)/stop.sh"
+    "${DRYCC_ROOT_DIR}/scripts/$(web_server_type)/stop.sh"
 }
 
 ########################
@@ -140,7 +140,7 @@ web_server_stop() {
 #########################
 web_server_restart() {
     info "Restarting $(web_server_type)"
-    "${BITNAMI_ROOT_DIR}/scripts/$(web_server_type)/restart.sh"
+    "${DRYCC_ROOT_DIR}/scripts/$(web_server_type)/restart.sh"
 }
 
 ########################
@@ -153,7 +153,7 @@ web_server_restart() {
 #   None
 #########################
 web_server_reload() {
-    "${BITNAMI_ROOT_DIR}/scripts/$(web_server_type)/reload.sh"
+    "${DRYCC_ROOT_DIR}/scripts/$(web_server_type)/reload.sh"
 }
 
 ########################

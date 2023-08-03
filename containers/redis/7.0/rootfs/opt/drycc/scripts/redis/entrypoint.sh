@@ -11,7 +11,6 @@ set -o pipefail
 . /opt/drycc/scripts/redis-env.sh
 
 # Load libraries
-# . /opt/drycc/scripts/libbitnami.sh
 . /opt/drycc/scripts/libredis.sh
 
 # print_welcome_page
