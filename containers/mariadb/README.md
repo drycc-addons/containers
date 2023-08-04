@@ -19,7 +19,7 @@ $ docker run --name mariadb -e ALLOW_EMPTY_PASSWORD=yes quay.io/drycc-addons/mar
 ### Docker Compose
 
 ```console
-$ curl -sSL https://raw.githubusercontent.com/drycc-addons/drycc-docker-mariadb/master/docker-compose.yml > docker-compose.yml
+$ curl -sSL https://raw.githubusercontent.com/drycc-addons/containers/main/containers/mariadb/docker-compose.yml > docker-compose.yml
 $ docker-compose up -d
 ```
 
@@ -38,9 +38,7 @@ $ docker pull quay.io/drycc-addons/mariadb:[TAG]
 If you wish, you can also build the image yourself by cloning the repository, changing to the directory containing the Dockerfile and executing the `docker build` command. Remember to replace the `VERSION` and `OPERATING-SYSTEM` path placeholders in the example command below with the correct values.
 
 ```console
-$ git clone https://github.com/drycc-addons/drycc-docker-mariadb.git
-$ cd drycc-docker-mariadb/VERSION/OPERATING-SYSTEM
-$ docker build -t drycc/mariadb:latest .
+$ docker build --build-arg="CODENAME=bookworm" -t quay.io/drycc-addons/mariadb 'https://github.com/drycc-addons/containers.git#main:containers/mariadb/11.0'
 ```
 
 ## Persisting your database
@@ -56,7 +54,7 @@ $ docker run \
     quay.io/drycc-addons/mariadb:10.8
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-mariadb/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/blob/main/containers/mariadb/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -163,7 +161,7 @@ Passing extra command-line flags to the mysqld service command is possible throu
 $ docker run --name mariadb -e ALLOW_EMPTY_PASSWORD=yes -e MARIADB_EXTRA_FLAGS='--max-connect-errors=1000 --max_connections=155' quay.io/drycc-addons/mariadb:10.8
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-mariadb/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/blob/main/containers/mariadb/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -196,7 +194,7 @@ Passing the `MARIADB_ROOT_PASSWORD` environment variable when running the image 
 $ docker run --name mariadb -e MARIADB_ROOT_PASSWORD=password123 quay.io/drycc-addons/mariadb:10.8
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-mariadb/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/blob/main/containers/mariadb/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -217,7 +215,7 @@ By default the MariaDB image expects all the available passwords to be set. In o
 $ docker run --name mariadb -e ALLOW_EMPTY_PASSWORD=yes quay.io/drycc-addons/mariadb:10.8
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-mariadb/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/mariadb/docker-compose.yml) file present in this repository:
 
 
 ```yaml
@@ -240,7 +238,7 @@ $ docker run --name mariadb \
     quay.io/drycc-addons/mariadb:10.8
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-mariadb/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/blob/main/containers/mariadb/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -265,7 +263,7 @@ $ docker run --name mariadb \
   quay.io/drycc-addons/mariadb:10.8
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-mariadb/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/blob/main/containers/mariadb/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -294,7 +292,7 @@ $ docker run --name mariadb \
     quay.io/drycc-addons/mariadb:10.8
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-mariadb/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/blob/main/containers/mariadb/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -341,7 +339,7 @@ $ docker run --name mariadb \
     quay.io/drycc-addons/mariadb:10.8
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-mariadb/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/blob/main/containers/mariadb/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -511,11 +509,11 @@ $ docker-compose up mariadb
 
 ## Contributing
 
-We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/drycc-docker-mariadb/issues), or submit a [pull request](https://github.com/drycc-addons/drycc-docker-mariadb/pulls) with your contribution.
+We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/containers/issues), or submit a [pull request](https://github.com/drycc-addons/containers/pulls) with your contribution.
 
 ## Issues
 
-If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/drycc-docker-mariadb/issues/new). For us to provide better support, be sure to include the following information in your issue:
+If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/containers/issues/new). For us to provide better support, be sure to include the following information in your issue:
 
 - Host OS and version
 - Docker version (`docker version`)

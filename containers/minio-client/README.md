@@ -19,7 +19,7 @@ $ docker run --name minio-client quay.io/drycc-addons/minio-client:latest
 ### Docker Compose
 
 ```console
-$ curl -sSL https://raw.githubusercontent.com/drycc-addons/drycc-docker-minio-client/main/docker-compose.yml > docker-compose.yml
+$ curl -sSL https://raw.githubusercontent.com/drycc-addons/containers/main/containers/minio-client/docker-compose.yml > docker-compose.yml
 $ docker-compose up -d
 ```
 ## Get this image
@@ -39,12 +39,12 @@ $ docker pull quay.io/drycc-addons/minio-client:[TAG]
 If you wish, you can also build the image yourself.
 
 ```console
-$ docker build -t quay.io/drycc-addons/minio-client:latest 'https://github.com/drycc-addons/drycc-docker-minio-client.git#main:2022/debian'
+$ docker build --build-arg="CODENAME=bookworm" -t quay.io/drycc-addons/minio-client 'https://github.com/drycc-addons/containers.git#main:containers/minio-client/2023'
 ```
 
 ## Connecting to other containers
 
-Using [Docker container networking](https://docs.docker.com/engine/userguide/networking/), a MinIO(R) Client can be used to access other running containers such as [MinIO(R) server](https://github.com/drycc-addons/drycc-docker-minio).
+Using [Docker container networking](https://docs.docker.com/engine/userguide/networking/), a MinIO(R) Client can be used to access other running containers such as [MinIO(R) server](https://github.com/drycc-addons/containers/tree/main/containers/minio).
 
 Containers attached to the same network can communicate with each other using the container name as the hostname.
 
@@ -101,7 +101,7 @@ $ docker run --rm --name minio-client \
     --env MINIO_SERVER_HOST="my.minio.domain" \
     --env MINIO_SERVER_ACCESS_KEY="minio-access-key" \
     --env MINIO_SERVER_SECRET_KEY="minio-secret-key" \
-    bitnami/minio-client \
+    quay.io/drycc-addons/minio-client \
     mb minio/my-bucket
 ```
 
@@ -109,11 +109,11 @@ Find more information about the client configuration in the [MinIO(R) Client doc
 
 ## Contributing
 
-We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/drycc-docker-minio-client/issues), or submit a [pull request](https://github.com/drycc-addons/drycc-docker-minio-client/pulls) with your contribution.
+We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/containers/issues), or submit a [pull request](https://github.com/drycc-addons/containers/pulls) with your contribution.
 
 ## Issues
 
-If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/drycc-docker-minio-client/issues/new). For us to provide better support, be sure to include the following information in your issue:
+If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/containers/issues/new). For us to provide better support, be sure to include the following information in your issue:
 
 - Host OS and version
 - Docker version (`docker version`)

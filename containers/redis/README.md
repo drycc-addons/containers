@@ -19,7 +19,7 @@ $ docker run --name redis -e ALLOW_EMPTY_PASSWORD=yes quay.io/drycc-addons/redis
 ### Docker Compose
 
 ```console
-$ curl -sSL https://raw.githubusercontent.com/drycc-addons/drycc-docker-redis/main/docker-compose.yml > docker-compose.yml
+$ curl -sSL https://raw.githubusercontent.com/drycc-addons/containers/main/containers/redis/docker-compose.yml > docker-compose.yml
 $ docker-compose up -d
 ```
 
@@ -42,12 +42,12 @@ $ docker pull quay.io/drycc-addons/redis:[TAG]
 If you wish, you can also build the image yourself.
 
 ```console
-$ docker build -t quay.io/drycc-addons/redis:6.2 'https://github.com/drycc-addons/drycc-docker-redis.git#main:6.2/debian-10'
+$ docker build --build-arg="CODENAME=bookworm" -t quay.io/drycc-addons/redis 'https://github.com/drycc-addons/containers.git#main:containers/redis/7.0'
 ```
 
 ## Persisting your database
 
-Redis(TM) provides a different range of [persistence options](https://redis.io/topics/persistence). This contanier uses *AOF persistence by default* but it is easy to overwrite that configuration in a `docker-compose.yaml` file with this entry `command: /opt/drycc/scripts/redis/run.sh --appendonly no`. Alternatively, you may use the `REDIS_AOF_ENABLED` env variable as explained in [Disabling AOF persistence](https://github.com/drycc-addons/drycc-docker-redis#disabling-aof-persistence).
+Redis(TM) provides a different range of [persistence options](https://redis.io/topics/persistence). This contanier uses *AOF persistence by default* but it is easy to overwrite that configuration in a `docker-compose.yaml` file with this entry `command: /opt/drycc/scripts/redis/run.sh --appendonly no`. Alternatively, you may use the `REDIS_AOF_ENABLED` env variable as explained in [Disabling AOF persistence](https://github.com/drycc-addons/containers/tree/main/containers/redis/#disabling-aof-persistence).
 
 If you remove the container all your data will be lost, and the next time you run the image the database will be reinitialized. To avoid this loss of data, you should mount a volume that will persist even after the container is removed.
 
@@ -60,7 +60,7 @@ $ docker run \
     quay.io/drycc-addons/redis:6.2
 ```
 
-You can also do this by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis/blob/main/docker-compose.yml) file present in this repository:
+You can also do this by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -157,7 +157,7 @@ For security reasons, you may want to disable some commands. You can specify the
 $ docker run --name redis -e REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL,CONFIG quay.io/drycc-addons/redis:6.2
 ```
 
-Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis/blob/main/docker-compose.yml) file present in this repository:
+Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -188,7 +188,7 @@ Passing extra command-line flags to the redis service command is possible by add
 $ docker run --name redis -e ALLOW_EMPTY_PASSWORD=yes quay.io/drycc-addons/redis:6.2 /opt/drycc/scripts/redis/run.sh --maxmemory 100mb
 ```
 
-Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis/blob/main/docker-compose.yml) file present in this repository:
+Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -210,7 +210,7 @@ Passing the `REDIS_PASSWORD` environment variable when running the image for the
 $ docker run --name redis -e REDIS_PASSWORD=password123 quay.io/drycc-addons/redis:6.2
 ```
 
-Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis/blob/main/docker-compose.yml) file present in this repository:
+Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -233,7 +233,7 @@ By default the Redis(TM) image expects all the available passwords to be set. In
 $ docker run --name redis -e ALLOW_EMPTY_PASSWORD=yes quay.io/drycc-addons/redis:6.2
 ```
 
-Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis/blob/main/docker-compose.yml) file present in this repository:
+Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -252,7 +252,7 @@ Redis(TM) offers different [options](https://redis.io/topics/persistence) when i
 $ docker run --name redis -e REDIS_AOF_ENABLED=no quay.io/drycc-addons/redis:6.2
 ```
 
-Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis/blob/main/docker-compose.yml) file present in this repository:
+Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -271,7 +271,7 @@ Redis(TM) offers [ACL](https://redis.io/topics/acl) since 6.0 which allows certa
 $ docker run -name redis -e REDIS_ACLFILE=/opt/drycc/redis/mounted-etc/users.acl -v /path/to/users.acl:/opt/drycc/redis/mounted-etc/users.acl quay.io/drycc-addons/redis:6.2
 ```
 
-Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis/blob/main/docker-compose.yml) file present in this repository:
+Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -292,7 +292,7 @@ By default, this image is set up to launch Redis(TM) in standalone mode on port 
 $ docker run --name redis -e REDIS_PORT_NUMBER=7000 -p 7000:7000 quay.io/drycc-addons/redis:6.2
 ```
 
-Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis/blob/main/docker-compose.yml) file present in this repository:
+Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -446,7 +446,7 @@ When enabling TLS, conventional standard traffic is disabled by default. However
       ...
     ```
 
-Alternatively, you may also provide with this configuration in your [custom](https://github.com/drycc-addons/drycc-docker-redis#configuration-file) configuration file.
+Alternatively, you may also provide with this configuration in your [custom](https://github.com/drycc-addons/containers/tree/main/containers/redis#configuration-file) configuration file.
 
 ### Configuration file
 
@@ -460,7 +460,7 @@ $ docker run --name redis \
     quay.io/drycc-addons/redis:6.2
 ```
 
-Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis/blob/main/docker-compose.yml) file present in this repository:
+Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -485,7 +485,7 @@ $ docker run --name redis \
     quay.io/drycc-addons/redis:6.2
 ```
 
-Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis/blob/main/docker-compose.yml) file present in this repository:
+Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -576,11 +576,11 @@ $ docker-compose up redis
 
 ## Contributing
 
-We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc/drycc-docker-redis/issues), or submit a [pull request](https://github.com/drycc/drycc-docker-redis/pulls) with your contribution.
+We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/containers/issues), or submit a [pull request](https://github.com/drycc-addons/containers/pulls) with your contribution.
 
 ## Issues
 
-If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/drycc-docker-redis/issues/new). For us to provide better support, be sure to include the following information in your issue:
+If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/containers/issues/new). For us to provide better support, be sure to include the following information in your issue:
 
 - Host OS and version
 - Docker version (`docker version`)

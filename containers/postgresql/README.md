@@ -19,7 +19,7 @@ $ docker run --name postgresql quay.io/drycc-addons/postgresql:14.2
 ### Docker Compose
 
 ```console
-$ curl -sSL https://raw.githubusercontent.com/drycc-addons/drycc-docker-postgresql/main/docker-compose.yml > docker-compose.yml
+$ curl -sSL https://raw.githubusercontent.com/drycc-addons/containers/main/containers/postgresql/docker-compose.yml > docker-compose.yml
 $ docker-compose up -d
 ```
 
@@ -42,7 +42,7 @@ $ docker pull quay.io/drycc-addons/postgresql:[TAG]
 If you wish, you can also build the image yourself.
 
 ```console
-$ docker build -t quay.io/drycc-addons/postgresql:14.2 'https://github.com/drycc-addons/drycc-docker-postgresql.git#main:14.2/debian'
+$ docker build --build-arg="CODENAME=bookworm" -t quay.io/drycc-addons/postgresql 'https://github.com/drycc-addons/containers.git#main:containers/postgresql/15'
 ```
 
 ## Persisting your database
@@ -57,7 +57,7 @@ $ docker run \
     quay.io/drycc-addons/postgresql:14.2
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-postgresql/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/postgresql/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -167,7 +167,7 @@ In the above commands you may have noticed the use of the `POSTGRESQL_PASSWORD` 
 $ docker run --name postgresql -e POSTGRESQL_PASSWORD=password123 quay.io/drycc-addons/postgresql:14.2
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-postgresql/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/postgresql/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -191,7 +191,7 @@ By passing the `POSTGRESQL_DATABASE` environment variable when running the image
 $ docker run --name postgresql -e POSTGRESQL_DATABASE=my_database quay.io/drycc-addons/postgresql:14.2
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-postgresql/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/postgresql/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -210,7 +210,7 @@ You can also create a restricted database user that only has permissions for the
 $ docker run --name postgresql -e POSTGRESQL_USERNAME=my_user -e POSTGRESQL_PASSWORD=password123 -e POSTGRESQL_DATABASE=my_database quay.io/drycc-addons/postgresql:14.2
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-postgresql/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/postgresql/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -511,7 +511,7 @@ When enabling TLS, PostgreSQL will support both standard and encrypted traffic b
       ...
     ```
 
-Alternatively, you may also provide this configuration in your [custom](https://github.com/drycc-addons/drycc-docker-postgresql#configuration-file) configuration file.
+Alternatively, you may also provide this configuration in your [custom](https://github.com/drycc-addons/containers/tree/main/containers/postgresql#configuration-file) configuration file.
 
 ### Configuration file
 
@@ -621,11 +621,11 @@ Specifying extra initdb arguments can easily be done using the following environ
 ```console
 $ docker run --name postgresql \
   -e POSTGRESQL_INITDB_ARGS="--data-checksums" \
-  -e POSTGRESQL_INITDB_WALDIR="/bitnami/waldir" \
+  -e POSTGRESQL_INITDB_WALDIR="/drycc/waldir" \
   quay.io/drycc-addons/postgresql:14.2
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-postgresql/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/postgresql/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -633,7 +633,7 @@ services:
   ...
     environment:
       - POSTGRESQL_INITDB_ARGS=--data-checksums
-      - POSTGRESQL_INITDB_WALDIR=/bitnami/waldir
+      - POSTGRESQL_INITDB_WALDIR=/drycc/waldir
   ...
 ```
 
@@ -774,11 +774,11 @@ $ docker-compose up postgresql
 
 ## Contributing
 
-We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/drycc-docker-postgresql/issues), or submit a [pull request](https://github.com/drycc-addons/drycc-docker-postgresql/pulls) with your contribution.
+We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/containers/issues), or submit a [pull request](https://github.com/drycc-addons/containers/pulls) with your contribution.
 
 ## Issues
 
-If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/drycc-docker-postgresql/issues/new). For us to provide better support, be sure to include the following information in your issue:
+If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/containers/issues/new). For us to provide better support, be sure to include the following information in your issue:
 
 - Host OS and version
 - Docker version (`docker version`)

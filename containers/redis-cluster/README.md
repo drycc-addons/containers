@@ -20,7 +20,7 @@ $ docker run --name redis-cluster -e ALLOW_EMPTY_PASSWORD=yes quay.io/drycc-addo
 ### Docker Compose
 
 ```console
-$ curl -sSL https://raw.githubusercontent.com/drycc-addons/drycc-docker-redis-cluster/main/docker-compose.yml > docker-compose.yml
+$ curl -sSL https://raw.githubusercontent.com/drycc-addons/containers/main/containers/redis-cluster/docker-compose.yml > docker-compose.yml
 $ docker-compose up -d
 ```
 
@@ -63,7 +63,7 @@ $ docker run \
     quay.io/drycc-addons/redis-cluster:[TAG]
 ```
 
-You can also do this with a minor change to the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis-cluster/blob/main/docker-compose.yml) file present in this repository:
+You can also do this with a minor change to the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis-cluster/docker-compose.yml) file present in this repository:
 
 ```yaml
 redis-cluster:
@@ -113,7 +113,7 @@ $ docker run --name redis \
     quay.io/drycc-addons/redis-cluster:[TAG]
 ```
 
-Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis/blob/main/docker-compose.yml) file present in this repository:
+Alternatively, modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -133,7 +133,7 @@ The following env vars are supported for this container:
 |-----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `REDIS_DISABLE_COMMANDS`                | Disables the specified Redis(TM) commands                                                                                                                                              |
 | `REDIS_PORT_NUMBER`                     | Set the Redis(TM) port. Default=: `6379`                                                                                                                                               |
-| `REDIS_PASSWORD`                        | Set the Redis(TM) password. Default: `bitnami`                                                                                                                                         |
+| `REDIS_PASSWORD`                        | Set the Redis(TM) password. Default: `drycc`                                                                                                                                         |
 | `ALLOW_EMPTY_PASSWORD`                  | Enables access without password                                                                                                                                                        |
 | `REDIS_DNS_RETRIES`                     | Number of retries to get the IPs of the provided `REDIS_NODES`. It will wait 5 seconds between retries                                                                                 |
 | `REDISCLI_AUTH`                         | Provide the same value as the configured `REDIS_PASSWORD` for the redis-cli tool to authenticate                                                                                       |
@@ -208,7 +208,7 @@ When enabling TLS, conventional standard traffic is disabled by default. However
         ...
       ...
     ```
-Alternatively, you may also provide with this configuration in your [custom](https://github.com/drycc-addons/drycc-docker-redis-cluster#configuration-file) configuration file.
+Alternatively, you may also provide with this configuration in your [custom](https://github.com/drycc-addons/containers/tree/main/containers/redis-cluster#configuration-file) configuration file.
 
 ## Logging
 
@@ -254,38 +254,16 @@ Re-create your container from the new image.
 $ docker run --name redis-cluster quay.io/drycc-addons/redis-cluster:[TAG]
 ```
 
-## Upgrading
-
-### To 5.0.12-debian-10-r48 release, 6.2.1-debian-10-r48 release , 6.0.12-debian-10-r48
-
-The cluster initialization logic has changed. Now the container in charge of initialize the cluster will also be part of the cluster. It will initialize Redis in background, create the cluster and then bring back to foreground the Redis process.
-
 ## Contributing
 
-We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/bitnami/bitnami-docker-redis-cluster/issues), or submit a [pull request](https://github.com/bitnami/bitnami-docker-redis-cluster/pulls) with your contribution.
+We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/containers/issues), or submit a [pull request](https://github.com/drycc-addons/containers/pulls) with your contribution.
 
 ## Issues
 
-If you encountered a problem running this container, you can file an [issue](https://github.com/bitnami/bitnami-docker-redis-cluster/issues). For us to provide better support, be sure to include the following information in your issue:
+If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/containers/issues/new). For us to provide better support, be sure to include the following information in your issue:
 
 - Host OS and version
 - Docker version (`docker version`)
 - Output of `docker info`
 - Version of this container
 - The command you used to run the container, and any relevant output you saw (masking any sensitive information)
-
-## License
-
-Copyright &copy; 2022 Bitnami
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.

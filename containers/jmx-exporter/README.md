@@ -33,7 +33,7 @@ $ docker pull quay.io/drycc-addons/jmx-exporter:[TAG]
 If you wish, you can also build the image yourself.
 
 ```console
-$ docker build -t quay.io/drycc-addons/jmx-exporter 'https://github.com/bitnami/bitnami-docker-jmx-exporter.git#main:0.17.0/debian'
+$ docker build --build-arg="CODENAME=bookworm" -t quay.io/drycc-addons/jmx-exporter 'https://github.com/drycc-addons/containers.git#main:containers/jmx-exporter/0'
 ```
 
 ## Connecting to other containers
@@ -112,11 +112,11 @@ $ docker run --name jmx-exporter quay.io/drycc-addons/jmx-exporter
 
 ## Contributing
 
-We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/drycc-docker-jmx-exporter/issues), or submit a [pull request](https://github.com/drycc-addons/drycc-docker-jmx-exporter/pulls) with your contribution.
+We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/containers/issues), or submit a [pull request](https://github.com/drycc-addons/containers/pulls) with your contribution.
 
 ## Issues
 
-If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/drycc-docker-jmx-exporter/issues/new). For us to provide better support, be sure to include the following information in your issue:
+If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/containers/issues/new). For us to provide better support, be sure to include the following information in your issue:
 
 - Host OS and version
 - Docker version (`docker version`)

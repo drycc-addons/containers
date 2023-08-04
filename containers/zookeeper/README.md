@@ -45,7 +45,7 @@ $ docker pull quay.io/drycc-addons/zookeeper:[TAG]
 If you wish, you can also build the image yourself.
 
 ```console
-docker build -t quay.io/drycc-addons/zookeeper:latest 'https://github.com/drycc-addons/drycc-docker-zookeeper.git#main:3.7.1/debian'
+$ docker build --build-arg="CODENAME=bookworm" -t quay.io/drycc-addons/zookeeper 'https://github.com/drycc-addons/containers.git#main:containers/zookeeper/3.8'
 ```
 
 ## Persisting your data
@@ -62,7 +62,7 @@ The image exposes a volume at `/drycc/zookeeper` for the Apache ZooKeeper data. 
 $ docker run -v /path/to/zookeeper-persistence:/drycc/zookeeper quay.io/drycc-addons/zookeeper:latest
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-zookeeper/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/zookeeper/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -197,7 +197,7 @@ The configuration can easily be setup with the Bitnami Apache ZooKeeper Docker i
 $ docker run --name zookeeper -e ZOO_SERVER_ID=1 quay.io/drycc-addons/zookeeper:latest
 ```
 
-or modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-zookeeper/blob/main/docker-compose.yml) file present in this repository:
+or modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/zookeeper/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -279,7 +279,7 @@ $ docker run -it -e ZOO_ENABLE_AUTH=yes \
                quay.io/drycc-addons/zookeeper
 ```
 
-or modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-zookeeper/blob/main/docker-compose.yml) file present in this repository:
+or modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/zookeeper/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -534,11 +534,11 @@ $ docker-compose up zookeeper
 
 ## Contributing
 
-We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/drycc-docker-zookeeper/issues), or submit a [pull request](https://github.com/drycc/drycc-addons-docker-zookeeper/pulls) with your contribution.
+We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/containers/issues), or submit a [pull request](https://github.com/drycc-addons/containers/pulls) with your contribution.
 
 ## Issues
 
-If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/drycc-docker-zookeeper/issues/new). For us to provide better support, be sure to include the following information in your issue:
+If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/containers/issues/new). For us to provide better support, be sure to include the following information in your issue:
 
 - Host OS and version
 - Docker version (`docker version`)

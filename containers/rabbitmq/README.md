@@ -41,9 +41,7 @@ docker pull quay.io/drycc-addons/rabbitmq:[TAG]
 If you wish, you can also build the image yourself by cloning the repository, changing to the directory containing the Dockerfile and executing the `docker build` command. Remember to replace the `APP`, `VERSION` and `OPERATING-SYSTEM` path placeholders in the example command below with the correct values.
 
 ```console
-git clone https://github.com/drycc/containers.git
-cd drycc/APP/VERSION/OPERATING-SYSTEM
-docker build -t quay.io/drycc-addons/APP:latest .
+$ docker build --build-arg="CODENAME=bookworm" -t quay.io/drycc-addons/rabbitmq 'https://github.com/drycc-addons/containers.git#main:containers/rabbitmq/3.12'
 ```
 
 ## Persisting your application
@@ -481,6 +479,16 @@ or using Docker Compose:
 docker-compose up rabbitmq
 ```
 
+## Contributing
+
+We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/containers/issues), or submit a [pull request](https://github.com/drycc-addons/containers/pulls) with your contribution.
+
 ## Issues
 
-If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/containers/issues/new/choose). For us to provide better support, be sure to fill the issue template.
+If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/containers/issues/new). For us to provide better support, be sure to include the following information in your issue:
+
+- Host OS and version
+- Docker version (`docker version`)
+- Output of `docker info`
+- Version of this container
+- The command you used to run the container, and any relevant output you saw (masking any sensitive information)

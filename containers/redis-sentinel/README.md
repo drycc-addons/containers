@@ -19,15 +19,11 @@ $ docker run --name redis-sentinel -e REDIS_MASTER_HOST=redis quay.io/drycc-addo
 ### Docker Compose
 
 ```console
-$ curl -sSL https://raw.githubusercontent.com/drycc-addons/drycc-docker-redis-sentinel/main/docker-compose.yml > docker-compose.yml
+$ curl -sSL https://raw.githubusercontent.com/drycc-addons/containers/main/containers/redis-sentinel/docker-compose.yml > docker-compose.yml
 $ docker-compose up -d
 ```
 
 **Warning**: This quick setup is only intended for development environments. You are encouraged to change the insecure default credentials and check out the available configuration options in the [Environment Variables](#environment-variables) section for a more secure deployment.
-
-## Why use a non-root container?
-
-Non-root container images add an extra layer of security and are generally recommended for production environments. However, because they run as a non-root user, privileged tasks are typically off-limits. Learn more about non-root containers [in our docs](https://docs.bitnami.com/tutorials/work-with-non-root-containers/).
 
 ## Get this image
 
@@ -211,13 +207,13 @@ When enabling TLS, conventional standard traffic is disabled by default. However
 
     ```console
     $ docker run --name redis-sentinel \
-        -v /path/to/certs:/opt/bitnami/redis/certs \
-        -v /path/to/redis-sentinel/persistence:/bitnami \
+        -v /path/to/certs:/opt/drycc/redis/certs \
+        -v /path/to/redis-sentinel/persistence:/drycc \
         -e REDIS_MASTER_HOST=redis \
         -e REDIS_SENTINEL_TLS_ENABLED=yes \
-        -e REDIS_SENTINEL_TLS_CERT_FILE=/opt/bitnami/redis/certs/redis.crt \
-        -e REDIS_SENTINEL_TLS_KEY_FILE=/opt/bitnami/redis/certs/redis.key \
-        -e REDIS_SENTINEL_TLS_CA_FILE=/opt/bitnami/redis/certs/redisCA.crt \
+        -e REDIS_SENTINEL_TLS_CERT_FILE=/opt/drycc/redis/certs/redis.crt \
+        -e REDIS_SENTINEL_TLS_KEY_FILE=/opt/drycc/redis/certs/redis.key \
+        -e REDIS_SENTINEL_TLS_CA_FILE=/opt/drycc/redis/certs/redisCA.crt \
         quay.io/drycc-addons/redis-sentinel:[TAG]
     ```
 
@@ -238,11 +234,11 @@ When enabling TLS, conventional standard traffic is disabled by default. However
         ...
       ...
     ```
-Alternatively, you may also provide with this configuration in your [custom](https://github.com/drycc-addons/drycc-docker-redis-sentinel#configuration-file) configuration file.
+Alternatively, you may also provide with this configuration in your [custom](https://github.com/drycc-addons/containers/tree/main/containers/redis-sentinel#configuration-file) configuration file.
 
 ### Configuration file
 
-The image looks for configurations in `/quay.io/drycc-addons/redis-sentinel/conf/`. You can mount a volume at `/bitnami` and copy/edit the configurations in the `/path/to/redis-persistence/redis-sentinel/conf/`. The default configurations will be populated to the `conf/` directory if it's empty.
+The image looks for configurations in `/quay.io/drycc-addons/redis-sentinel/conf/`. You can mount a volume at `/drycc` and copy/edit the configurations in the `/path/to/redis-persistence/redis-sentinel/conf/`. The default configurations will be populated to the `conf/` directory if it's empty.
 
 #### Step 1: Run the Redis(TM) Sentinel image
 
@@ -255,7 +251,7 @@ $ docker run --name redis-sentinel \
     quay.io/drycc-addons/redis-sentinel:[TAG]
 ```
 
-You can also modify the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-redis-sentinel/blob/main/docker-compose.yml) file present in this repository:
+You can also modify the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/redis-sentinel/blob/main/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -367,41 +363,16 @@ or using Docker Compose:
 $ docker-compose up redis
 ```
 
-## Notable Changes
-
-### 4.0.14-debian-9-r201, 4.0.14-ol-7-r222, 5.0.5-debian-9-r169, 5.0.5-ol-7-r175
-
-- Decrease the size of the container. The configuration logic is now based on Bash scripts in the `rootfs/` folder.
-
-### 4.0.10-r25
-
-- The Redis(TM) sentinel container has been migrated to a non-root container approach. Previously the container run as `root` user and the redis daemon was started as `redis` user. From now own, both the container and the redis daemon run as user `1001`. As a consequence, the configuration files are writable by the user running the redis process. You can revert this behavior by changing `USER 1001` to `USER root` in the Dockerfile.
-
 ## Contributing
 
-We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/bitnami/bitnami-docker-redis-sentinel/issues), or submit a [pull request](https://github.com/bitnami/bitnami-docker-redis-sentinel/pulls) with your contribution.
+We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/containers/issues), or submit a [pull request](https://github.com/drycc-addons/containers/pulls) with your contribution.
 
 ## Issues
 
-If you encountered a problem running this container, you can file an [issue](https://github.com/bitnami/bitnami-docker-redis-sentinel/issues/new). For us to provide better support, be sure to include the following information in your issue:
+If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/containers/issues/new). For us to provide better support, be sure to include the following information in your issue:
 
 - Host OS and version
 - Docker version (`docker version`)
 - Output of `docker info`
 - Version of this container
 - The command you used to run the container, and any relevant output you saw (masking any sensitive information)
-
-## License
-Copyright &copy; 2022 Bitnami
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.

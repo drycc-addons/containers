@@ -35,7 +35,7 @@ $ docker pull quay.io/drycc-addons/kubectl:[TAG]
 If you wish, you can also build the image yourself.
 
 ```console
-$ docker build -t quay.io/drycc-addons/kubectl:latest 'https://github.com/drycc-addons/drycc-docker-kubectl.git#main1.24/debian'
+$ docker build --build-arg="CODENAME=bookworm" -t quay.io/drycc-addons/kubectl 'https://github.com/drycc-addons/containers.git#main:containers/kubectl/1.27'
 ```
 
 ## Configuration
@@ -60,15 +60,14 @@ $ docker run --rm --name kubectl -v /path/to/your/kube/config:/.kube/config quay
 
 ## Contributing
 
-We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/drycc-docker-kubectl/issues), or submit a [pull request](https://github.com/drycc-addons/drycc-docker-kubectl/pulls) with your contribution.
+We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/containers/issues), or submit a [pull request](https://github.com/drycc-addons/containers/pulls) with your contribution.
 
 ## Issues
 
-If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/drycc-docker-kubectl/issues/new). For us to provide better support, be sure to include the following information in your issue:
+If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/containers/issues/new). For us to provide better support, be sure to include the following information in your issue:
 
 - Host OS and version
 - Docker version (`docker version`)
 - Output of `docker info`
 - Version of this container
 - The command you used to run the container, and any relevant output you saw (masking any sensitive information)
-

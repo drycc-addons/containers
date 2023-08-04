@@ -19,7 +19,7 @@ $ docker run --name minio quay.io/drycc-addons/minio:latest
 ### Docker Compose
 
 ```console
-$ curl -sSL https://raw.githubusercontent.com/drycc-addons/drycc-docker-minio/main/docker-compose.yml > docker-compose.yml
+$ curl -sSL https://raw.githubusercontent.com/drycc-addons/containers/main/containers/minio/docker-compose.yml > docker-compose.yml
 $ docker-compose up -d
 ```
 
@@ -34,7 +34,7 @@ $ docker pull quay.io/drycc-addons/minio:[TAG]
 If you wish, you can also build the image yourself.
 
 ```console
-$ docker build -t quay.io/drycc-addons/minio:latest 'https://github.com/drycc-addons/drycc-docker-minio.git#main:2022/debian'
+$ docker build --build-arg="CODENAME=bookworm" -t quay.io/drycc-addons/minio 'https://github.com/drycc-addons/containers.git#main:containers/minio/2023'
 ```
 
 ## Persisting your database
@@ -51,7 +51,7 @@ $ docker run --name minio \
     quay.io/drycc-addons/minio:latest
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-minio/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/blob/main/containers/minio/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -72,7 +72,7 @@ Containers attached to the same network can communicate with each other using th
 
 ### Using the Command Line
 
-In this example, we will create a [MinIO(R) client](https://github.com/drycc-addons/drycc-docker-minio-client) container that will connect to the server container that is running on the same docker network as the client.
+In this example, we will create a [MinIO(R) client](https://github.com/drycc-addons/containers/tree/main/containers/minio-client) container that will connect to the server container that is running on the same docker network as the client.
 
 #### Step 1: Create a network
 
@@ -162,7 +162,7 @@ $ docker exec minio mc admin info local
 or using Docker Compose:
 
 ```console
-$ curl -sSL https://raw.githubusercontent.com/drycc-addons/drycc-docker-minio/main/docker-compose.yml > docker-compose.yml
+$ curl -sSL https://raw.githubusercontent.com/drycc-addons/containers/main/containers/minio/docker-compose.yml > docker-compose.yml
 $ docker-compose up -d
 $ docker-compose exec minio mc admin info local
 ```
@@ -179,7 +179,7 @@ $ docker run --name minio \
     quay.io/drycc-addons/minio:latest
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-minio/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/minio/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -205,7 +205,7 @@ $ docker run --name minio \
     quay.io/drycc-addons/minio:latest
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-minio/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/minio/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -354,7 +354,7 @@ $ docker run --name minio \
     quay.io/drycc-addons/minio:latest
 ```
 
-or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/drycc-docker-minio/blob/main/docker-compose.yml) file present in this repository:
+or by modifying the [`docker-compose.yml`](https://github.com/drycc-addons/containers/tree/main/containers/minio/docker-compose.yml) file present in this repository:
 
 ```yaml
 services:
@@ -428,4 +428,14 @@ $ docker-compose up minio
 
 ## Contributing
 
-We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/drycc-docker-minio/issues), or submit a [pull request](https://github.com/drycc-addons/drycc-docker-minio/pulls) with your contribution.
+We'd love for you to contribute to this container. You can request new features by creating an [issue](https://github.com/drycc-addons/containers/issues), or submit a [pull request](https://github.com/drycc-addons/containers/pulls) with your contribution.
+
+## Issues
+
+If you encountered a problem running this container, you can file an [issue](https://github.com/drycc-addons/containers/issues/new). For us to provide better support, be sure to include the following information in your issue:
+
+- Host OS and version
+- Docker version (`docker version`)
+- Output of `docker info`
+- Version of this container
+- The command you used to run the container, and any relevant output you saw (masking any sensitive information)

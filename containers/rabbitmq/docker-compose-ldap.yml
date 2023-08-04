@@ -5,7 +5,7 @@ version: '2'
 
 services:
   rabbitmq:
-    image: registry.uucin.com/lijianguo/rabbitmq:3.12.2
+    image: registry.drycc.cc/drycc-addons/rabbitmq:3.12.2
     ports:
       - '4369:4369'
       - '5551:5551'
