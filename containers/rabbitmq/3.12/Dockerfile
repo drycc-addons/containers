@@ -3,7 +3,7 @@ FROM registry.drycc.cc/drycc/base:${CODENAME}
 
 ENV GOSU_VERSION="1.16" \
   ERLANG_VERSION="26.0.2" \
-  RABBITMQ_VERSION="3.12.2"
+  RABBITMQ_VERSION="3.12.3"
 
 COPY prebuildfs /
 
@@ -30,7 +30,7 @@ RUN install-packages libnss-wrapper \
 COPY rootfs /
 RUN /opt/drycc/scripts/rabbitmq/postunpack.sh
 
-VOLUME [ "/drycc/postgresql", "/docker-entrypoint-initdb.d", "/docker-entrypoint-preinitdb.d" ]
+VOLUME [ "/docker-entrypoint-initdb.d", "/docker-entrypoint-preinitdb.d" ]
 
 EXPOSE 4369 5551 5552 5671 5672 15671 15672 25672
 
