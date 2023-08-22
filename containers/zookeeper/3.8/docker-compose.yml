@@ -6,7 +6,7 @@ services:
     ports:
       - '2181:2181'
     volumes:
-      - 'zookeeper_data:/drycc/zookeeper'
+      - 'zookeeper_data:/drycc'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
 

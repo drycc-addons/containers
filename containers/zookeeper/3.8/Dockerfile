@@ -5,18 +5,19 @@ ENV JAVA_VERSION="17" \
     GOSU_VERSION="1.16" \
     WAIT_FOR_PORT_VERSION="1.0.6" \
     RENDER_TEMPLATE_VERSION="1.0.3" \
+    NETCAT_VERSION="0.7.1" \
     ZOOKEEPER_VERSION="3.8.2"
 
 ARG JAVA_EXTRA_SECURITY_DIR="/drycc/java/extra-security"
 
 COPY prebuildfs /
 
-RUN install-packages libnss-wrapper psmisc \
+RUN install-packages libnss-wrapper psmisc procps xmlstarlet zlib1g \
   && install-stack java $JAVA_VERSION \
   && install-stack gosu $GOSU_VERSION \
   && install-stack wait-for-port $WAIT_FOR_PORT_VERSION \
+  && install-stack netcat $NETCAT_VERSION \
   && install-stack zookeeper $ZOOKEEPER_VERSION \
-  && cp /opt/drycc/zookeeper/conf/zoo_sample.cfg /opt/drycc/zookeeper/conf/zoo.cfg \
   && echo "export NSS_WRAPPER_LIB=/usr/lib/`echo $(uname -m)`-linux-gnu/libnss_wrapper.so" >> /opt/drycc/zookeeper/profile.d/zookeeper.sh \
   && mkdir -p $JAVA_EXTRA_SECURITY_DIR \
   && . init-stack \

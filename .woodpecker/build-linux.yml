@@ -7,7 +7,7 @@ platform: ${platform}
 
 clone:
   git:
-    image: docker.io/woodpeckerci/plugin-git:2.0.3
+    image: docker.io/woodpeckerci/plugin-git:2.1.1
     settings:
       partial: false
       depth: 2

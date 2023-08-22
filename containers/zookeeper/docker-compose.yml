@@ -2,14 +2,14 @@ version: '2'
 
 services:
   zookeeper:
-    image: registry.drycc.cc/drycc-addons/zookeeper:3.8
+    image: registry.drycc.cc/drycc-addons/zookeeper:3.9
     ports:
       - '2181:2181'
     volumes:
-      - 'zookeeper_data:/drycc/zookeeper'
+      - 'zookeeper_data:/drycc'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
-
+      - ZOO_4LW_COMMANDS_WHITELIST="srvr, mntr, ruok"
 volumes:
   zookeeper_data:
     driver: local

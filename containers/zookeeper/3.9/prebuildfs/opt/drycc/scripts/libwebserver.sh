@@ -112,7 +112,11 @@ is_web_server_running() {
 #########################
 web_server_start() {
     info "Starting $(web_server_type) in background"
-    "${DRYCC_ROOT_DIR}/scripts/$(web_server_type)/start.sh"
+    if [[ "${DRYCC_SERVICE_MANAGER:-}" = "systemd" ]]; then
+        systemctl start "drycc.$(web_server_type).service"
+    else
+        "${DRYCC_ROOT_DIR}/scripts/$(web_server_type)/start.sh"
+    fi
 }
 
 ########################
@@ -126,7 +130,11 @@ web_server_start() {
 #########################
 web_server_stop() {
     info "Stopping $(web_server_type)"
-    "${DRYCC_ROOT_DIR}/scripts/$(web_server_type)/stop.sh"
+    if [[ "${DRYCC_SERVICE_MANAGER:-}" = "systemd" ]]; then
+        systemctl stop "drycc.$(web_server_type).service"
+    else
+        "${DRYCC_ROOT_DIR}/scripts/$(web_server_type)/stop.sh"
+    fi
 }
 
 ########################
@@ -140,7 +148,11 @@ web_server_stop() {
 #########################
 web_server_restart() {
     info "Restarting $(web_server_type)"
-    "${DRYCC_ROOT_DIR}/scripts/$(web_server_type)/restart.sh"
+    if [[ "${DRYCC_SERVICE_MANAGER:-}" = "systemd" ]]; then
+        systemctl restart "drycc.$(web_server_type).service"
+    else
+        "${DRYCC_ROOT_DIR}/scripts/$(web_server_type)/restart.sh"
+    fi
 }
 
 ########################
@@ -153,7 +165,11 @@ web_server_restart() {
 #   None
 #########################
 web_server_reload() {
-    "${DRYCC_ROOT_DIR}/scripts/$(web_server_type)/reload.sh"
+    if [[ "${DRYCC_SERVICE_MANAGER:-}" = "systemd" ]]; then
+        systemctl reload "drycc.$(web_server_type).service"
+    else
+        "${DRYCC_ROOT_DIR}/scripts/$(web_server_type)/reload.sh"
+    fi
 }
 
 ########################
