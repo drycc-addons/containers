@@ -1,0 +1,7 @@
+version: '2'
+
+services:
+  fluent-bit:
+    image: registry.drycc.cc/drycc-addons/fluent-bit:2
+    ports:
+      - '2020:2020'
