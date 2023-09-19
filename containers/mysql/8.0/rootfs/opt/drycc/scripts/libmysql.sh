@@ -237,7 +237,7 @@ create or replace user '$user'@'%' $([ "$password" != "" ] && echo "identified b
 EOF
     else
         mysql_execute "mysql" "$DB_ROOT_USER" "$DB_ROOT_PASSWORD" <<EOF
-create user if not exists '$user'@'%' $([ "$password" != "" ] && echo "identified with 'mysql_native_password' by \"$password\"");
+create user if not exists '$user'@'%' $([ "$password" != "" ] && echo "identified by \"$password\"");
 EOF
     fi
     mysql_execute "mysql" "$DB_ROOT_USER" "$DB_ROOT_PASSWORD" <<EOF
