@@ -1,0 +1,1 @@
+sudo docker build --build-arg CODENAME=bookworm -t registry.drycc.cc/drycc-addons/mysql:8.0.34 --no-cache .

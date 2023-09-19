@@ -1,0 +1,27 @@
+# Copyright VMware, Inc.
+# SPDX-License-Identifier: APACHE-2.0
+
+version: '2.1'
+
+services:
+  mysql:
+    image: registry.drycc.cc/drycc-addons/mysql:8.0.34
+    ports:
+      - '3306:3306'
+    volumes:
+      - './data:/drycc/mysql/data'
+    environment:
+      - MYSQL_REPLICATION_MODE=master
+      # - MYSQL_REPLICATION_USER=repl_user
+      # - MYSQL_REPLICATION_PASSWORD=repl_user_password
+      # - MYSQL_ROOT_PASSWORD=my_root_password
+      - ALLOW_EMPTY_PASSWORD=yes
+   # healthcheck:
+   #   test: ['CMD', '/opt/drycc/scripts/mysql/healthcheck.sh']
+   #   interval: 15s
+   ##   timeout: 5s
+   #   retries: 6
+
+volumes:
+  mysql_data:
+    driver: local
