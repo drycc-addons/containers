@@ -13,7 +13,8 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN install-packages ca-certificates curl gcc-12 libaio1 libcom-err2 libgcc-s1 libgssapi-krb5-2 libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libsasl2-2  libstdc++6 libtinfo6 libtirpc3 procps psmisc
 
 RUN mkdir -p /tmp/drycc/pkg/cache/ && cd /tmp/drycc/pkg/cache/ && \
-    install-stack mysql $MYSQL_VERSION 
+    install-stack mysql $MYSQL_VERSION && \
+    mv /opt/drycc/mysql/mysql/* /opt/drycc/mysql/ && rm -rf /opt/drycc/mysql/mysql/
 #    rm -rf /opt/drycc/mysql/mysql-8.0/mysql-test && mv /opt/drycc/mysql/mysql-8.0/* /opt/drycc/mysql/ && rm /opt/drycc/mysql/mysql-8.0/
 
 RUN install-stack ini-file 1.4.5
