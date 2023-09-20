@@ -32,7 +32,7 @@ mysql_extra_flags() {
 
     if [[ -n "$DB_REPLICATION_MODE" ]]; then
         randNumber="$(head /dev/urandom | tr -dc 0-9 | head -c 3 ; echo '')"
-        dbExtraFlags+=("--server-id=$randNumber" "--binlog-format=ROW" "--log-bin=mysql-bin" "--sync-binlog=1")
+        dbExtraFlags+=("--server-id=$randNumber" "--log-bin=mysql-bin" "--sync-binlog=1")
         if [[ "$DB_REPLICATION_MODE" = "slave" ]]; then
             dbExtraFlags+=("--relay-log=mysql-relay-bin" "--log-slave-updates=1" "--read-only=1")
             if [[ "$DB_FLAVOR" = "mysql" ]]; then
@@ -41,7 +41,7 @@ mysql_extra_flags() {
         elif [[ "$DB_REPLICATION_MODE" = "master" ]]; then
             dbExtraFlags+=("--innodb_flush_log_at_trx_commit=1")
         fi
-    fi
+    fi 
 
     [[ "${#userExtraFlags[@]}" -eq 0 ]] || dbExtraFlags+=("${userExtraFlags[@]}")
 
