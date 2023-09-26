@@ -7,7 +7,6 @@ ENV HOME="/" \
     OS_NAME="linux" \
     PROMETHEUS_VERSION="2.47.0"
 
-COPY prebuildfs /
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Install required system packages and dependencies
 RUN install-packages  ca-certificates curl procps
@@ -22,8 +21,8 @@ RUN apt-get autoremove --purge -y curl && \
      apt-get update && apt-get upgrade -y && \
      apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 RUN chmod g+rwX /opt/drycc
-
-RUN chown -R 1001:1001 /opt/drycc/prometheus
+ 
+RUN chown -R 1001:1001 /opt/drycc/prometheus 
 
 RUN mkdir -p /opt/drycc/prometheus/data/ && chmod g+rwX /opt/drycc/prometheus/data/
 ENV APP_VERSION="2.47.0" \
