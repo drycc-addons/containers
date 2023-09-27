@@ -1,0 +1,17 @@
+# Copyright VMware, Inc.
+# SPDX-License-Identifier: APACHE-2.0
+
+version: '2'
+
+services:
+  grafana:
+    image: docker.io/drycc/grafana:10
+    ports:
+      - '3000:3000'
+    environment:
+      - 'GF_SECURITY_ADMIN_PASSWORD=drycc'
+    volumes:
+      - grafana_data:/opt/drycc/grafana/data
+volumes:
+  grafana_data:
+    driver: local
