@@ -1,1 +1,0 @@
-sudo docker build --build-arg CODENAME=bookworm -t registry.drycc.cc/drycc-addons/mysqlshell:debian-12 --no-cache .
