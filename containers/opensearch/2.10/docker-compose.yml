@@ -2,7 +2,7 @@ version: '2'
 
 services:
   opensearch:
-    image: registry.drycc.cc/drycc-addons/opensearch:2.9
+    image: registry.drycc.cc/drycc-addons/opensearch:2.10
     ports:
       - '9200:9200'
       - '9300:9300'

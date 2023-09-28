@@ -24,7 +24,7 @@ docker-compose up -d
 
 ## Get this image
 
-The recommended way to get the Drycc OpenSearch Dashboards Docker Image is to pull the prebuilt image from the [Drycc Registry](https://quay.io/repository/drycc-addons).
+The recommended way to get the Drycc OpenSearch Dashboards Docker Image is to pull the prebuilt image from the [Container Registry](https://quay.io/repository/drycc-addons).
 
 ```console
 docker pull registry.drycc.cc/drycc-addons/opensearch-dashboards:latest

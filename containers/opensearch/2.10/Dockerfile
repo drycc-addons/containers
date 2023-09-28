@@ -3,7 +3,7 @@ FROM registry.drycc.cc/drycc/base:${CODENAME}
 
 ENV YQ_VERSION="4.35.1" \
   JAVA_VERSION="17.0.8" \
-  OPENSEARCH_VERSION="2.9.0"
+  OPENSEARCH_VERSION="2.10.0"
 
 COPY prebuildfs /
 
