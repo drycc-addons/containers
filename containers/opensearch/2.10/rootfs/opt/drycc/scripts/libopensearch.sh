@@ -129,7 +129,8 @@ opensearch_security_configure_users() {
 opensearch_transport_tls_configuration(){
     info "Configuring Opensearch Transport TLS settings..."
     elasticsearch_conf_set plugins.security.ssl.transport.enabled "true"
-    elasticsearch_conf_write plugins.security.ssl.transport.enforce_hostname_verification "$DB_TLS_VERIFICATION_MODE" bool
+    elasticsearch_conf_write plugins.security.ssl.transport.enforce_hostname_verification "$DB_TRANSPORT_TLS_ENFORCE_HOSTNAME_VERIFICATION" bool
+    # elasticsearch_conf_write opensearch.ssl.verificationMode "$DB_TLS_VERIFICATION_MODE" string
 
     if is_boolean_yes "$DB_TRANSPORT_TLS_USE_PEM"; then
         debug "Configuring Transport Layer TLS settings using PEM certificates..."
@@ -940,7 +941,10 @@ elasticsearch_healthcheck() {
 
     host=$(get_elasticsearch_hostname)
 
-    is_boolean_yes "$DB_ENABLE_SECURITY" && is_boolean_yes "$DB_ENABLE_REST_TLS" && protocol="https" && command_args+=("-k" "--user" "${DB_USERNAME}:${DB_PASSWORD}")
+    if is_boolean_yes "$DB_ENABLE_SECURITY"; then
+        command_args+=("-k" "--user" "${DB_USERNAME}:${DB_PASSWORD}")
+        is_boolean_yes "$DB_ENABLE_REST_TLS" && protocol="https"
+    fi
 
     # Combination of --silent, --output and --write-out allows us to obtain both the status code and the request body
     output=$(mktemp)
