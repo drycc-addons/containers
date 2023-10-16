@@ -33,7 +33,7 @@ print_welcome_page() {
 }
 
 ########################
-# Print the welcome page for a Bitnami Docker image
+# Print the welcome page for a Drycc Container image
 # Globals:
 #   DRYCC_APP_NAME
 # Arguments:
