@@ -33,7 +33,13 @@ RUN /opt/drycc/scripts/spark/postunpack.sh
 RUN /opt/drycc/scripts/java/postunpack.sh
 
 VOLUME [ "/docker-entrypoint-initdb.d", "/docker-entrypoint-preinitdb.d" ]
+ENV NSS_WRAPPER_GROUP="/opt/drycc/spark/tmp/nss_group" \
+  NSS_WRAPPER_PASSWD="/opt/drycc/spark/tmp/nss_passwd" \
+  PYTHONPATH="/opt/drycc/spark/python/:$PYTHONPATH" \
+  SPARK_HOME="/opt/drycc/spark" \
+  SPARK_USER="spark"
 
+WORKDIR /opt/drycc/spark
 USER 1001
 ENTRYPOINT [ "init-stack", "/opt/drycc/scripts/spark/entrypoint.sh" ]
 CMD [ "/opt/drycc/scripts/spark/run.sh" ]

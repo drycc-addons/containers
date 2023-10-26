@@ -16,10 +16,6 @@ set -o pipefail
 . /opt/drycc/scripts/spark-env.sh
 
 if [ ! $EUID -eq 0 ] && [ -e "$NSS_WRAPPER_LIB" ]; then
-    # shellcheck disable=SC2155
-    export NSS_WRAPPER_PASSWD="$(mktemp)"
-    # shellcheck disable=SC2155
-    export NSS_WRAPPER_GROUP="$(mktemp)"
     echo "spark:x:$(id -u):$(id -g):Spark:$SPARK_HOME:/bin/false" > "$NSS_WRAPPER_PASSWD"
     echo "spark:x:$(id -g):" > "$NSS_WRAPPER_GROUP"
     echo "LD_PRELOAD=$NSS_WRAPPER_LIB" >> "$SPARK_CONF_DIR/spark-env.sh"
