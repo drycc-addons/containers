@@ -4,13 +4,15 @@ FROM registry.drycc.cc/drycc/base:${CODENAME}
 COPY entrypoint.sh /
 COPY rootfs /
 ENV PG_MAJOR=15 \
-  PG_MINOR=3 
+    PG_MINOR=3 \
+    WALG_VERSION="2.0.1"
 
 ENV HOME=/opt/drycc/postgresql \
   PGDATA=$HOME/$PG_MAJOR \
   PGHOME=$HOME/
 
 RUN . init-stack && install-stack postgresql $PG_MAJOR.$PG_MINOR \
+  && install-stack wal-g $WALG_VERSION \
   && export DEBIAN_FRONTEND=noninteractive \
   && echo 'APT::Install-Recommends "0";\nAPT::Install-Suggests "0";' > /etc/apt/apt.conf.d/01norecommend \
   && apt-get update -y \
