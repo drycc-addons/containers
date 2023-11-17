@@ -7,7 +7,10 @@ if [[ $UID -ge 10000 ]]; then
     rm /tmp/passwd
 fi
 
-sh /opt/drycc/postgresql/scripts/pre_init.sh
+if test -f /opt/drycc/postgresql/scripts/pre_init.sh ; then 
+    sh /opt/drycc/postgresql/scripts/pre_init.sh
+fi
+
 unset PATRONI_SUPERUSER_PASSWORD PATRONI_REPLICATION_PASSWORD
 
 exec /usr/bin/python3 /usr/local/bin/patroni /opt/drycc/postgresql/patroni.yml

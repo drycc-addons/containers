@@ -1,16 +1,13 @@
 ARG CODENAME
 FROM registry.drycc.cc/drycc/base:${CODENAME}
 
-COPY entrypoint.sh /
-COPY rootfs /
 ENV PG_MAJOR=15 \
     PG_MINOR=3 \
-    WALG_VERSION="2.0.1"
-
-ENV HOME=/opt/drycc/postgresql \
-  PGDATA=$HOME/$PG_MAJOR \
-  PGHOME=$HOME/
-
+    WALG_VERSION="2.0.1" \
+    HOME=/opt/drycc/postgresql 
+ENV PGDATA=$HOME/$PG_MAJOR/data \
+    PGHOME=$HOME
+# Install postgresql && wal-g
 RUN . init-stack && install-stack postgresql $PG_MAJOR.$PG_MINOR \
   && install-stack wal-g $WALG_VERSION \
   && export DEBIAN_FRONTEND=noninteractive \
@@ -22,9 +19,12 @@ RUN . init-stack && install-stack postgresql $PG_MAJOR.$PG_MINOR \
      ## Make sure we have a en_US.UTF-8 locale available
    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
    && pip3 install --break-system-packages setuptools \
-   && pip3 install --break-system-packages 'git+https://github.com/zalando/patroni.git#egg=patroni[kubernetes]' \
-   && mkdir -p $PGHOME \
-   RUN chmod g+rwX $PGHOME \
+   && pip3 install --break-system-packages 'git+https://github.com/zalando/patroni.git#egg=patroni[kubernetes]' 
+# Prepare init script
+COPY rootfs / 
+COPY entrypoint.sh /
+
+RUN chmod g+rwX $PGHOME \
    && sed -i "s|/var/lib/postgresql.*|$PGHOME:/bin/bash|" /etc/passwd \
    # Set permissions for OpenShift
    && chmod 775 $PGHOME \
@@ -51,8 +51,9 @@ RUN . init-stack && install-stack postgresql $PG_MAJOR.$PG_MINOR \
    && mkdir -p $PGDATA  \
    && groupadd postgres && useradd -g postgres postgres \
    && chown -R postgres:postgres $HOME 
+
 ENV LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 EDITOR=/usr/bin/editor \
-    PATH=$PATH:/opt/drycc/postgresql/$PG_MAJOR/bin/
+    PATH=$PATH:/opt/drycc/postgresql/$PG_MAJOR/bin/:/opt/drycc/wal-g/bin/
 USER postgres
 ENTRYPOINT ["init-stack", "/entrypoint.sh"]
 EXPOSE 5432 8008 
