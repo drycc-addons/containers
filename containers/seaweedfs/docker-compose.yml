@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  seaweedfs:
+    image: registry.drycc.cc/drycc-addons/seaweedfs:3
+    environment:
+    - SEAWEEDFS_ACCESS_KEY=admin
+    - SEAWEEDFS_SECRET_KEY=admin
+    - SEAWEEDFS_EXTRA_ARGS=server -dir=/drycc -s3
+    volumes:
+    - seaweedfs_data:/drycc
+volumes:
+  seaweedfs_data:
+    driver: local
+  redis_data:
+    driver: local
