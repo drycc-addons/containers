@@ -2,7 +2,7 @@ ARG CODENAME
 FROM registry.drycc.cc/drycc/base:${CODENAME}
 
 ENV PG_MAJOR=15 \
-    PG_MINOR=3 \
+    PG_MINOR=5 \
     WALG_VERSION="2.0.1" \
     HOME=/opt/drycc/postgresql 
 ENV PGDATA=$HOME/$PG_MAJOR/data \
