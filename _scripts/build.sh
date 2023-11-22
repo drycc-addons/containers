@@ -13,8 +13,8 @@ build() {
         project_dir=$BASE_DIR/containers/$project/$version
         if [ -d "$project_dir" ]; then
             cd $project_dir
-            docker build --build-arg CODENAME=$codename . -t $image
-            docker push $image
+            podman build --build-arg CODENAME=$codename . -t $image
+            podman push $image
             cd -
         fi
     done
@@ -30,7 +30,7 @@ manifest() {
             cp -rf .woodpecker/manifest.tmpl .woodpecker/manifest
             sed -i "s/{{project}}/${project}/g" .woodpecker/manifest
             sed -i "s/{{version}}/${version}/g" .woodpecker/manifest
-            docker run --rm \
+            podman run --rm \
             -e PLUGIN_SPEC=.woodpecker/manifest \
             -e PLUGIN_USERNAME=$CONTAINER_USERNAME \
             -e PLUGIN_PASSWORD=$CONTAINER_PASSWORD \

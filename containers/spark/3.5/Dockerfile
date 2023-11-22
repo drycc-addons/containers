@@ -1,7 +1,7 @@
 ARG CODENAME
 FROM registry.drycc.cc/drycc/base:${CODENAME}
 
-ENV SPARK_VERSION="3.4.1" \
+ENV SPARK_VERSION="3.5.0" \
   PYTHON_VERSION="3.11.4" \
   JAVA_VERSION="17.0.8"
 
