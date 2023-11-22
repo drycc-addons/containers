@@ -6,11 +6,9 @@ services:
     environment:
     - SEAWEEDFS_ACCESS_KEY=admin
     - SEAWEEDFS_SECRET_KEY=admin
-    - SEAWEEDFS_EXTRA_ARGS=server -dir=/drycc -s3
+    - SEAWEEDFS_EXTRA_ARGS=server -dir=/seaweedfs -s3
     volumes:
-    - seaweedfs_data:/drycc
+    - seaweedfs_data:/seaweedfs
 volumes:
   seaweedfs_data:
-    driver: local
-  redis_data:
     driver: local
