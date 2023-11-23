@@ -14,6 +14,10 @@
 . /opt/drycc/scripts/libservice.sh
 . /opt/drycc/scripts/libvalidations.sh
 
+
+S3_CONFIG_FILE="/etc/seaweedfs/s3.json"
+FILER_CONFIG_FILE="/etc/seaweedfs/filer.toml"
+
 # Functions
 
 ########################
@@ -92,19 +96,27 @@ seaweedfs_validate() {
         # ok if the file exists
     }
 
-    if [[ -z "$SEAWEEDFS_ACCESS_KEY" ]]; then
-        print_validation_error "You must indicate a access key"
-    fi
+    if [ ! -f "$S3_CONFIG_FILE" ]; then
+        if [[ -z "$SEAWEEDFS_ACCESS_KEY" ]]; then
+            print_validation_error "You must indicate a access key"
+        fi
 
-    if [[ -z "$SEAWEEDFS_SECRET_KEY" ]]; then
-        print_validation_error "You must indicate a secret key"
+        if [[ -z "$SEAWEEDFS_SECRET_KEY" ]]; then
+            print_validation_error "You must indicate a secret key"
+        fi
+    fi
+    if [ ! -f "$FILER_CONFIG_FILE" ]; then
+        if [[ -z "$SEAWEEDFS_FILER_PATH" ]]; then
+            print_validation_error "You must indicate a filer path"
+        fi
     fi
 
     [[ "$error_code" -eq 0 ]] || return "$error_code"
 }
 
 seaweedfs_initialize(){
-  cat << EOF >> "/etc/seaweedfs/s3.json"
+    if [ ! -f "$S3_CONFIG_FILE" ]; then
+        cat << EOF >> "$S3_CONFIG_FILE"
 {
     "identities": [
         {
@@ -120,4 +132,14 @@ seaweedfs_initialize(){
     ]
 }
 EOF
+    fi
+    if [ ! -f "$FILER_CONFIG_FILE" ]; then
+        cat << EOF >> "$FILER_CONFIG_FILE"
+[leveldb3]
+# similar to leveldb2.
+# each bucket has its own meta store.
+enabled = true
+dir = "${SEAWEEDFS_FILER_PATH}"                    # directory to store level db files
+EOF
+    fi
 }

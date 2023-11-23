@@ -29,6 +29,7 @@ seaweedfs_env_vars=(
     SEAWEEDFS_ACCESS_KEY
     SEAWEEDFS_SECRET_KEY
     SEAWEEDFS_EXTRA_ARGS
+    SEAWEEDFS_FILER_PATH
 )
 for env_var in "${seaweedfs_env_vars[@]}"; do
     file_env_var="${env_var}_FILE"
