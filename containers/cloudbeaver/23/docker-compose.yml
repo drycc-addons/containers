@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  cloudbeaver:
+    image: registry.drycc.cc/drycc-addons/cloudbeaver:23.1.5
+    ports:
+      - '8978:8978'
+    volumes:
+      - './cloudbeaver_data:/opt/drycc/cloudbeaver/workspace/'
+    
