@@ -10,9 +10,15 @@ app = FastAPI()
 @app.get("/pg_backup")
 async def pg_backup():
     shell_bash =  """
-          echo `hostname` `date`
-          wal-g backup-push $PGDATA
-          wal-g delete retain FULL $BACKUP_NUM_TO_RETAIN --confirm
+          echo 'backup begin.: ' `hostname` `date`
+          if [ -f /opt/drycc/postgresql/backup/backup.env ]; then
+            source /opt/drycc/postgresql/backup/backup.env
+            if [ $(echo $USE_WALG | tr '[:upper:]' '[:lower:]') == 'true' ]; then
+              wal-g backup-push $PGDATA
+              wal-g delete retain FULL $BACKUP_NUM_TO_RETAIN --confirm
+              echo 'backup done.: ' `hostname` `date`
+            fi
+          fi
         """
     process = subprocess.Popen(
         shell_bash,
