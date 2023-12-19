@@ -12,13 +12,13 @@ Trademarks: This software listing is packaged by Drycc. The respective trademark
 The recommended way to get the drycc-addons Fluent Bit Docker Image is to pull the prebuilt image from the [Drycc Registry](https://registry.drycc.cc).
 
 ```console
-docker pull registry.drycc.cc/drycc-addons/fluent-bit:canary
+docker pull registry.drycc.cc/drycc-addons/fluentbit:canary
 ```
 
 To use a specific version, you can pull a versioned tag.
 
 ```console
-docker pull registry.drycc.cc/drycc-addons/fluent-bit:[TAG]
+docker pull registry.drycc.cc/drycc-addons/fluentbit:[TAG]
 ```
 
 If you wish, you can also build the image yourself by cloning the repository, changing to the directory containing the Dockerfile and executing the `docker build` command. Remember to replace the `APP`, `VERSION` and `OPERATING-SYSTEM` path placeholders in the example command below with the correct values.
@@ -43,10 +43,10 @@ Fluent Bit supports multiple extensions via plugins.
 
 ## Logging
 
-The Drycc fluent-bit Docker image sends the container logs to the `stdout`. To view the logs:
+The Drycc fluentbit Docker image sends the container logs to the `stdout`. To view the logs:
 
 ```console
-docker logs fluent-bit
+docker logs fluentbit
 ```
 
 You can configure the containers [logging driver](https://docs.docker.com/engine/admin/logging/overview/) using the `--log-driver` option if you wish to consume the container logs differently. In the default configuration docker uses the `json-file` driver.
