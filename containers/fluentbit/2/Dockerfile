@@ -11,7 +11,6 @@ COPY prebuildfs /
 RUN install-stack python ${PYTHON_VERSION} && . init-stack \
   && python3 -m venv /opt/drycc/.venv \
   && source /opt/drycc/.venv/bin/activate \
-  # set env
   && echo "source /opt/drycc/.venv/bin/activate" >> /opt/drycc/python/profile.d/python.sh \
   && install-stack fluent-bit ${FLUENT_BIT_VERSION} \
   && chown -R ${DRYCC_UID}:${DRYCC_GID} /opt/drycc/fluent-bit \
