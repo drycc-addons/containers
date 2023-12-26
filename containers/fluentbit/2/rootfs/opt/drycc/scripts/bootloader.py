@@ -1,135 +1,127 @@
 #!/usr/bin/env python3
 
 import os
-import sys
 import yaml
 import time
+import click
 import logging
-from kubernetes import client, config, watch
+from kubernetes import client, watch
 from kubernetes.client.rest import ApiException
 
 
-usage = """
-The fluentbit bootloader script calls to a k8s API.
-
-Usage: python fluentbit.py <command> <namespace>
-
-Valid commands for boot:
-
-controller         start the controller to manage fluentbit
-fluentbit          fluentbit is logging and metrics processor and forwarder
-collection         run carbage collection to clean fluentbit
-
-For example 'boot controller py3django' to collect logs from the py3django namespace.
-"""
 logger = logging.getLogger(__name__)
 
-WATCH_RETRY_INTERVAL = os.environ.get("WATCH_RETRY_INTERVAL", 5)
-FLUENTBIT_CLUSTER_ID = os.environ.get("FLUENTBIT_CLUSTER_ID", "415cceb6692")
-FLUENTBIT_CREATE_TPL_PATH = os.environ.get(
-    "FLUENTBIT_CREATE_TPL_PATH", "/opt/drycc/fluent-bit/templates/kube-pod-template.yaml")
+
+def load_kube_config():
+    with open('/var/run/secrets/kubernetes.io/serviceaccount/token') as token_file:
+        token = token_file.read()
+    ""
+    host = "https://%s:%s" % (
+        os.environ.get("KUBERNETES_SERVICE_HOST", "127.0.0.1"),
+        os.environ.get("KUBERNETES_SERVICE_PORT", "443"),
+    )
+    config = client.Configuration(host=host)
+    config.api_key = {"authorization": "Bearer " + token}
+    config.verify_ssl = True
+    if config.verify_ssl:
+        config.ssl_ca_cert = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+    client.Configuration.set_default(config)
 
 
-def gen_agent_name(node_name):
-    return f"fluentbit-agent-{node_name}-{FLUENTBIT_CLUSTER_ID}"
+def load_daemon_set(daemonset_file):
+    if os.path.exists(daemonset_file):
+        with open(daemonset_file) as f:
+            return yaml.safe_load(f)
+    else:
+        raise FileNotFoundError(
+            "daemonset template path %s not found" % daemonset_file)
 
 
-def get_agent_pods(v1, namespace):
-    label_selector = ",".join([
-        f'fluentbit.addons.drycc.cc/id={FLUENTBIT_CLUSTER_ID}',
-        f'fluentbit.addons.drycc.cc/type=agent',
-    ])
-    return v1.list_namespaced_pod(namespace, label_selector=label_selector)
-
-
-def get_node_names(v1, namespace):
-    label_selector = ",".join([
-        f'fluentbit.addons.drycc.cc/type!=agent',
-        f'fluentbit.addons.drycc.cc/type!=controller',
-    ])
-    node_names = {
-        item.spec.node_name 
-        for item in v1.list_namespaced_pod(
-            namespace,
-            label_selector=label_selector,
-        ).items
+def create_daemon_set(namespace, daemonset, node_names):
+    apps_v1_api = client.AppsV1Api()
+    daemonset["spec"]["template"]["spec"]["affinity"] = {
+        "nodeAffinity": {
+            "requiredDuringSchedulingIgnoredDuringExecution": {
+                "nodeSelectorTerms": [{
+                    "matchExpressions": [{
+                        "key": "kubernetes.io/hostname",
+                        "operator": "In",
+                        "values": node_names,
+                    }]
+                }],
+            }
+        }
     }
-    return node_names
+    apps_v1_api.create_namespaced_daemon_set(namespace, body=daemonset)
 
 
-def create_pod(v1, namespace, node_name):
-    name = gen_agent_name(node_name)
+def refresh_daemon_set(namespace, daemonset):
+    kwargs = {
+        "namespace": namespace,
+        "label_selector": ",".join(
+            [f"{key}!={value}" for key, value in daemonset["spec"]["selector"]["matchLabels"].items()]
+        ),
+    }
+    apps_v1_api = client.AppsV1Api()
+    core_v1_api = client.CoreV1Api()
+    new_node_names = list({
+        item.spec.node_name for item in core_v1_api.list_namespaced_pod(**kwargs).items
+    })
+    daemon_set_name = daemonset["metadata"]["name"]
     try:
-        v1.read_namespaced_pod(name, namespace)
+        daemonset = apps_v1_api.read_namespaced_daemon_set(daemon_set_name, namespace)
+        old_node_names = daemonset.spec.template.spec.affinity.node_affinity.\
+            required_during_scheduling_ignored_during_execution.\
+                node_selector_terms[0].match_expressions[0].values
+        if len(new_node_names) == 0:
+            apps_v1_api.delete_namespaced_daemon_set(daemon_set_name, namespace)
+        else:
+            old_node_names.sort()
+            new_node_names.sort()
+            if old_node_names != new_node_names:
+                old_node_names.clear()
+                old_node_names.extend(new_node_names)
+            apps_v1_api.patch_namespaced_daemon_set(daemon_set_name, namespace, body=daemonset)
     except ApiException as e:
         if e.status == 404:
-            if os.path.exists(FLUENTBIT_CREATE_TPL_PATH):
-                with open(FLUENTBIT_CREATE_TPL_PATH) as f:
-                    pod = yaml.safe_load(f)
-                    pod["metadata"]["name"] = name
-                    pod["metadata"]["labels"].update({
-                        "fluentbit.addons.drycc.cc/id": FLUENTBIT_CLUSTER_ID,
-                        "fluentbit.addons.drycc.cc/type": "agent",
-                    })
-                    v1.create_namespaced_pod(body=pod, namespace=namespace)
-            else:
-                raise e
+            create_daemon_set(namespace, daemonset, new_node_names)
         else:
             raise e
 
 
-def delete_pod(v1, namespace, node_name):
-    name = gen_agent_name(node_name)
-    return v1.delete_namespaced_pod(name, namespace)
-
-
-def fluentbit(*args):
-    os.execvp("fluent-bit", args)
-
-
-def controller(v1, namespace):
+@click.command()
+@click.option("--namespace", "namespace", required=True, help="k8s namespace.")
+@click.option("--daemonset-file", "daemonset_file", required=True, help="k8s daemonset template path.")
+@click.option("--retry-interval", "retry_interval", show_default=True, default=60, type=int, help="k8s watch retry interval.")
+def main(namespace, daemonset_file, retry_interval):
+    daemonset = load_daemon_set(daemonset_file)
     kwargs = {
         "namespace": namespace,
         "watch": True,
-        "label_selector": ",".join([
-            f'fluentbit.addons.drycc.cc/type!=agent',
-            f'fluentbit.addons.drycc.cc/type!=controller',
-        ]),
+        "timeout_seconds": retry_interval,
+        "label_selector": ",".join(
+            [f"{key}!={value}" for key, value in daemonset["spec"]["selector"]["matchLabels"].items()]
+        ),
     }
+    load_kube_config()
+    deleted_timestamp = 0
+    refresh_daemon_set(namespace, daemonset)
+    core_v1_api = client.CoreV1Api()
     while True:
         w = watch.Watch()
         try:
-            for event in w.stream(v1.list_namespaced_pod, **kwargs):
-                pod_name = event['object'].metadata.name
+            for event in w.stream(core_v1_api.list_namespaced_pod, **kwargs):
                 node_name = event['object'].spec.node_name
-                if node_name and pod_name != gen_agent_name(node_name):
-                    if event['type'] in ("ADDED", "MODIFIED"):
-                        create_pod(v1, namespace, node_name)
-                    elif event['type'] == "DELETED":
-                        delete_pod(v1, namespace, node_name)
+                if node_name:
+                    if event['type'] in ("ADDED", "MODIFIED", "DELETED"):
+                        deleted_timestamp = int(time.time())
+            interval = int(time.time()) - deleted_timestamp
+            if deleted_timestamp > 0 and interval > retry_interval:
+                refresh_daemon_set(namespace, daemonset)
+                deleted_timestamp = 0
         except Exception as ex:
-            logger.info(f"re watch the {namespace} pod, the reason is: {ex}")
+            logger.exception(ex)
             w.stop()
-        time.sleep(WATCH_RETRY_INTERVAL)
-
-
-def collection(v1, namespace):
-    node_names = get_node_names(v1, namespace)
-    for pod in get_agent_pods(v1, namespace).items:
-        if pod.spec.node_name not in node_names:
-            delete_pod(v1, namespace, pod.spec.node_name)
-    print("Complete garbage collection...")
-
-
-def main():
-    if len(sys.argv) > 1:
-        command = sys.argv[1]
-        if command in ("controller", "fluentbit", "collection"):
-            config.load_kube_config()
-            v1 = client.CoreV1Api()
-            eval(command)(v1, *sys.argv[2:])
-            sys.exit()
-    print(usage)
 
 
 if __name__ == "__main__":

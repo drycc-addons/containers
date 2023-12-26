@@ -14,7 +14,7 @@ RUN install-stack python ${PYTHON_VERSION} && . init-stack \
   && echo "source /opt/drycc/.venv/bin/activate" >> /opt/drycc/python/profile.d/python.sh \
   && install-stack fluent-bit ${FLUENT_BIT_VERSION} \
   && chown -R ${DRYCC_UID}:${DRYCC_GID} /opt/drycc/fluent-bit \
-  && pip install pyyaml kubernetes-client
+  && pip install pyyaml kubernetes-client click
 
 ADD rootfs /
 USER ${DRYCC_UID}
