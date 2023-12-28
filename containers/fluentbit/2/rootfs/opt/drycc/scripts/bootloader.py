@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def load_kube_config():
+    print("start loading Kube configuration file.")
     with open('/var/run/secrets/kubernetes.io/serviceaccount/token') as token_file:
         token = token_file.read()
     ""
@@ -38,6 +39,7 @@ def load_daemon_set(daemonset_file):
 
 
 def create_daemon_set(namespace, daemonset, node_names):
+    print(f"create daemonset in namespace {namespace}, node_names: {node_names}.")
     apps_v1_api = client.AppsV1Api()
     daemonset["spec"]["template"]["spec"]["affinity"] = {
         "nodeAffinity": {
@@ -67,6 +69,7 @@ def refresh_daemon_set(namespace, daemonset):
     new_node_names = list({
         item.spec.node_name for item in core_v1_api.list_namespaced_pod(**kwargs).items
     })
+    print(f"refresh daemonset in namespace {namespace}, node_names: {new_node_names}.")
     daemon_set_name = daemonset["metadata"]["name"]
     try:
         daemonset = apps_v1_api.read_namespaced_daemon_set(daemon_set_name, namespace)
@@ -104,21 +107,19 @@ def main(namespace, daemonset_file, retry_interval):
         ),
     }
     load_kube_config()
-    deleted_timestamp = 0
-    refresh_daemon_set(namespace, daemonset)
+    deleted_timestamp = int(time.time())
     core_v1_api = client.CoreV1Api()
     while True:
         w = watch.Watch()
         try:
+            if deleted_timestamp > 0:
+                refresh_daemon_set(namespace, daemonset)
+                deleted_timestamp = 0
             for event in w.stream(core_v1_api.list_namespaced_pod, **kwargs):
                 node_name = event['object'].spec.node_name
                 if node_name:
                     if event['type'] in ("ADDED", "MODIFIED", "DELETED"):
                         deleted_timestamp = int(time.time())
-            interval = int(time.time()) - deleted_timestamp
-            if deleted_timestamp > 0 and interval > retry_interval:
-                refresh_daemon_set(namespace, daemonset)
-                deleted_timestamp = 0
         except Exception as ex:
             logger.exception(ex)
             w.stop()
