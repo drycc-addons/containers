@@ -1,0 +1,52 @@
+#!/bin/bash
+
+usage(){
+  cat <<EOF
+Run a command when the directory is updated
+
+Description:
+  Simple binary to trigger a reload when a directory is updated
+
+Usage: config-reloader [options] -- [COMMAND [ARG...]]
+
+Examples:
+  config-reloader -w /etc/nginx -d 10 -- nginx -s reload
+  config-reloader -w /etc/proxy -d 10 -- curl -X POST http://127.0.0.1/_/reload
+
+Options:
+  -w WATCH       the directory to watch for updates
+  -d DELAY       the delay seconds for calling shell
+
+EOF
+}
+
+md5dir(){
+  local md5=$(find $1 -type f -exec md5sum {} \; | md5sum | awk -F ' ' '{print $1}')
+  echo $md5
+}
+
+while getopts 'w:d:' opt; do
+  case $opt in
+    (w)  watch=$OPTARG;;
+    (d)  delay=$OPTARG;;
+  esac
+done
+
+shell=$(echo "$@" | awk -F " -- " '{print $NF}')
+
+if [[ "$watch" == "" || "$delay" == "" || "$shell" == "" ]]; then
+  usage
+else
+  md5=$(md5dir "$watch")
+  md5_timestamp=$(date +%s)
+  for ((;;)); do
+    inotifywait -t "$delay" -mrqq -e "create,modify,move,delete,unmount" "$watch"
+    if [[ $(( $(date +%s) - $md5_timestamp )) -gt "$delay" ]]; then
+      new_md5=$(md5dir "$watch")
+      if [[ $md5 != "$new_md5" ]]; then
+        bash -ec "$shell"
+        md5="$new_md5"
+      fi
+    fi
+  done
+fi
