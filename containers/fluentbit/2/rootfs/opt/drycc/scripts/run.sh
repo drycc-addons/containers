@@ -25,5 +25,5 @@ info "** Starting Fluentbit **"
 if am_i_root; then
     gosu "${FLUENTBIT_DAEMON_USER}" "${BOOTLOADER}" "${fluentbit_extra_args[@]}"
 else
-    "${BOOTLOADER}" "${fluentbit_extra_args[@]}"
+    exec "${BOOTLOADER}" "${fluentbit_extra_args[@]}"
 fi
