@@ -28,9 +28,9 @@ if ! am_i_root && [[ -e "$LIBNSS_WRAPPER_PATH" ]]; then
 fi
 
 # Install custom python package if requirements.txt is present
-if [[ -f "/drycc/python/requirements.txt" ]]; then
+if [[ -f "/opt/drycc/python/requirements.txt" ]]; then
     . /opt/drycc/airflow/venv/bin/activate
-    pip install -r /drycc/python/requirements.txt
+    pip install -r /opt/drycc/python/requirements.txt
     deactivate
 fi
 

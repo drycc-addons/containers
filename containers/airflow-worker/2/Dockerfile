@@ -31,14 +31,11 @@ RUN install-stack ini-file ${INI_FILE_VERSION}
 RUN install-stack python ${PYTHON_VERSION}
 RUN install-stack wait-for-port ${WAIT_FOR_PORT_VERSION}
 
-RUN chmod g+rwX /opt/drycc && mkdir /opt/drycc/airflow/ 
+RUN chmod g+rwX /opt/drycc 
 RUN . init-stack &&  python3 -m venv /opt/drycc/airflow/venv && source /opt/drycc/airflow/venv/bin/activate &&  \
     pip install apache-airflow[postgres,celery,ftp,github,redis,sftp,sqlite,ssh]==${AIRFLOW_VERSION} --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt" && \
-    echo "source /opt/drycc/airflow/venv/bin/activate" >> /opt/drycc/python/profile.d/python.sh && \
-    pip install apache-airflow-providers-apache-flink --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt" \
-    pip install apache-airflow-providers-apache-kafka --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt" \
-    pip install apache-airflow-providers-apache-spark --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt" \
-    pip install apache-airflow-providers-common-sql --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt" 
+    pip install -r /opt/drycc/airflow-worker/requirements.txt --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt" && \
+    echo "source /opt/drycc/airflow/venv/bin/activate" >> /opt/drycc/python/profile.d/python.sh
 
 RUN localedef -c -f UTF-8 -i en_US en_US.UTF-8
 RUN update-locale LANG=C.UTF-8 LC_MESSAGES=POSIX && \
