@@ -95,4 +95,9 @@ export SPARK_METRICS_ENABLED="${SPARK_METRICS_ENABLED:-false}"
 export SPARK_DAEMON_USER="spark"
 export SPARK_DAEMON_GROUP="spark"
 
+# NSS LD_PRELOAD setting
+if [ ! $EUID -eq 0 ] && [ -e "$NSS_WRAPPER_LIB" ]; then
+    export LD_PRELOAD=$NSS_WRAPPER_LIB
+fi
+
 # Custom environment variables may be defined below
