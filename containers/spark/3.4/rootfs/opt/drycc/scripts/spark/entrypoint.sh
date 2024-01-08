@@ -18,7 +18,7 @@ set -o pipefail
 if [ ! $EUID -eq 0 ] && [ -e "$NSS_WRAPPER_LIB" ]; then
     echo "spark:x:$(id -u):$(id -g):Spark:$SPARK_HOME:/bin/false" > "$NSS_WRAPPER_PASSWD"
     echo "spark:x:$(id -g):" > "$NSS_WRAPPER_GROUP"
-    echo "LD_PRELOAD=$NSS_WRAPPER_LIB" >> "$SPARK_CONF_DIR/spark-env.sh"
+    export LD_PRELOAD=$NSS_WRAPPER_LIB
 fi
 
 if [[ "$1" = "/opt/drycc/scripts/spark/run.sh" ]]; then
