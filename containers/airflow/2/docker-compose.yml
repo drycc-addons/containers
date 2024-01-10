@@ -22,30 +22,47 @@ services:
       # ALLOW_EMPTY_PASSWORD is recommended only for development.
       - ALLOW_EMPTY_PASSWORD=yes
   airflow-scheduler:
-    image: registry.drycc.cc/drycc-addons/airflow-scheduler:2.8.1
+    image: registry.drycc.cc/drycc-addons/airflow:2
     environment:
       - AIRFLOW_DATABASE_NAME=drycc_airflow
       - AIRFLOW_DATABASE_USERNAME=bn_airflow
       - AIRFLOW_DATABASE_PASSWORD=drycc1
       - AIRFLOW_EXECUTOR=CeleryExecutor
       - AIRFLOW_WEBSERVER_HOST=airflow
+      - AIRFLOW_EXTRA_ARGS=scheduler
+      - 'AIRFLOW_CELERY_BROKER_TRANSPORT_OPTIONS={"visibility_timeout": 3600}'
+      - AIRFLOW_STATSD_ON=True
+      - AIRFLOW_STATSD_HOST=statsd-exporter
   airflow-worker:
-    image: registry.drycc.cc/drycc-addons/airflow-worker:2.8.1
+    image: registry.drycc.cc/drycc-addons/airflow:2
     environment:
       - AIRFLOW_DATABASE_NAME=drycc_airflow
       - AIRFLOW_DATABASE_USERNAME=bn_airflow
       - AIRFLOW_DATABASE_PASSWORD=drycc1
       - AIRFLOW_EXECUTOR=CeleryExecutor
       - AIRFLOW_WEBSERVER_HOST=airflow
+      - AIRFLOW_EXTRA_ARGS=celery worker
+      - 'AIRFLOW_CELERY_BROKER_TRANSPORT_OPTIONS={"visibility_timeout": 3600}'
+      - AIRFLOW_STATSD_ON=True
+      - AIRFLOW_STATSD_HOST=statsd-exporter
   airflow:
-    image: registry.drycc.cc/drycc-addons/airflow:2.8.1
+    image: registry.drycc.cc/drycc-addons/airflow:2
     environment:
       - AIRFLOW_DATABASE_NAME=drycc_airflow
       - AIRFLOW_DATABASE_USERNAME=bn_airflow
       - AIRFLOW_DATABASE_PASSWORD=drycc1
       - AIRFLOW_EXECUTOR=CeleryExecutor
+      - AIRFLOW_EXTRA_ARGS=webserver
+      - 'AIRFLOW_CELERY_BROKER_TRANSPORT_OPTIONS={"visibility_timeout": 3600}'
+      - AIRFLOW_STATSD_ON=True
+      - AIRFLOW_STATSD_HOST=statsd-exporter
     ports:
       - '8088:8080'
+  statsd-exporter:
+    image: registry.drycc.cc/drycc-addons/statsd-exporter:0
+    ports:
+      - '9102:9102'
+
 volumes:
   postgresql_data:
     driver: local

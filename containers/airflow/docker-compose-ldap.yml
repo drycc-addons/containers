@@ -20,27 +20,35 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
   airflow-scheduler:
-    image: docker.io/drycc/airflow-scheduler:2
+    image: registry.drycc.cc/drycc-addons/airflow:2
     environment:
       - AIRFLOW_DATABASE_NAME=drycc_airflow
       - AIRFLOW_DATABASE_USERNAME=bn_airflow
       - AIRFLOW_DATABASE_PASSWORD=drycc1
       - AIRFLOW_EXECUTOR=CeleryExecutor
       - AIRFLOW_WEBSERVER_HOST=airflow
+      - AIRFLOW_EXTRA_ARGS=scheduler
+      - 'AIRFLOW_CELERY_BROKER_TRANSPORT_OPTIONS={"visibility_timeout": 3600}'
+      - AIRFLOW_STATSD_ON=True
+      - AIRFLOW_STATSD_HOST=statsd-exporter
     volumes:
       - airflow_scheduler_data:/drycc
   airflow-worker:
-    image: docker.io/drycc/airflow-worker:2
+    image: registry.drycc.cc/drycc-addons/airflow:2
     environment:
       - AIRFLOW_DATABASE_NAME=drycc_airflow
       - AIRFLOW_DATABASE_USERNAME=bn_airflow
       - AIRFLOW_DATABASE_PASSWORD=drycc1
       - AIRFLOW_EXECUTOR=CeleryExecutor
       - AIRFLOW_WEBSERVER_HOST=airflow
+      - AIRFLOW_EXTRA_ARGS=celery worker
+      - 'AIRFLOW_CELERY_BROKER_TRANSPORT_OPTIONS={"visibility_timeout": 3600}'
+      - AIRFLOW_STATSD_ON=True
+      - AIRFLOW_STATSD_HOST=statsd-exporter
     volumes:
       - airflow_worker_data:/drycc
   airflow:
-    image: docker.io/drycc/airflow:2
+    image: registry.drycc.cc/drycc-addons/airflow:2
     environment:
       - AIRFLOW_LDAP_ENABLE=yes
       - AIRFLOW_LDAP_URI=ldap://openldap:1389
@@ -59,6 +67,10 @@ services:
       - AIRFLOW_PASSWORD=drycc123
       - AIRFLOW_USERNAME=customuser
       - AIRFLOW_EMAIL=user@example.com
+      - AIRFLOW_EXTRA_ARGS=webserver
+      - 'AIRFLOW_CELERY_BROKER_TRANSPORT_OPTIONS={"visibility_timeout": 3600}'
+      - AIRFLOW_STATSD_ON=True
+      - AIRFLOW_STATSD_HOST=statsd-exporter
     ports:
       - '8080:8080'
     volumes:
@@ -74,6 +86,11 @@ services:
       - LDAP_PASSWORDS=custompassword
     volumes:
       - 'openldap_data:/drycc/openldap'
+  statsd-exporter:
+    image: registry.drycc.cc/drycc-addons/statsd-exporter:0
+    ports:
+      - '9102:9102'
+      - '9125:9125'
 
 volumes:
   airflow_scheduler_data:

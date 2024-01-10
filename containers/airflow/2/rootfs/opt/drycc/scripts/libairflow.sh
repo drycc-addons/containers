@@ -211,7 +211,8 @@ airflow_generate_config() {
     # ref: https://airflow.apache.org/docs/apache-airflow/stable/configurations-ref.html#secret-key
     [[ -n "$AIRFLOW_FERNET_KEY" ]] && airflow_conf_set "core" "fernet_key" "$AIRFLOW_FERNET_KEY"
     [[ -n "$AIRFLOW_SECRET_KEY" ]] && airflow_conf_set "webserver" "secret_key" "$AIRFLOW_SECRET_KEY"
-
+    # Configure Airflow statsd exporter
+    airflow_configure_statsd_exporter
     # Configure Airflow executor
     airflow_conf_set "core" "executor" "$AIRFLOW_EXECUTOR"
     [[ "$AIRFLOW_EXECUTOR" == "CeleryExecutor" || "$AIRFLOW_EXECUTOR" == "CeleryKubernetesExecutor" ]] && airflow_configure_celery_executor
@@ -387,6 +388,23 @@ airflow_encode_url() {
 }
 
 ########################
+# Configure Airflow statsd statsd
+# Globals:
+#   AIRFLOW_*
+# Arguments:
+#   None
+# Returns:
+#   None
+#########################
+airflow_configure_statsd_exporter() {
+    airflow_conf_set "metrics" "statsd_on" "${AIRFLOW_STATSD_ON:-false}"
+    airflow_conf_set "metrics" "statsd_host" "${AIRFLOW_STATSD_HOST:-localhost}"
+    airflow_conf_set "metrics" "statsd_port" "${AIRFLOW_STATSD_PORT:-9125}"
+    airflow_conf_set "metrics" "statsd_prefix" "${AIRFLOW_STATSD_PREFIX:-airflow}"
+}
+
+
+########################
 # Configure Airflow celery executor
 # Globals:
 #   AIRFLOW_*
@@ -398,20 +416,24 @@ airflow_encode_url() {
 airflow_configure_celery_executor() {
     info "Configuring Celery Executor"
 
-    # Configure celery Redis url
-    local -r redis_user=$(airflow_encode_url "$REDIS_USER")
-    local -r redis_password=$(airflow_encode_url "$REDIS_PASSWORD")
-    airflow_conf_set "celery" "broker_url" "redis://${redis_user}:${redis_password}@${REDIS_HOST}:${REDIS_PORT_NUMBER}/${REDIS_DATABASE}"
-    is_boolean_yes "$AIRFLOW_REDIS_USE_SSL" && airflow_conf_set "celery" "broker_url" "rediss://${redis_user}:${redis_password}@${REDIS_HOST}:${REDIS_PORT_NUMBER}/${REDIS_DATABASE}"
-    is_boolean_yes "$AIRFLOW_REDIS_USE_SSL" && airflow_conf_set "celery" "redis_backend_use_ssl" "true"
-
+    # Configure celery broker url
+    info "Configuring celery broker url"
+    airflow_conf_set "celery" "broker_url" "${AIRFLOW_CELERY_BROKER_URL}"
+    # Configure broker_transport_options
+    info "Configuring broker_transport_options"
+    readarray -t keys < <(echo "$AIRFLOW_CELERY_BROKER_TRANSPORT_OPTIONS" | jq -r --compact-output 'keys[]')
+    for key in "${keys[@]}"; do
+        airflow_conf_set "celery_broker_transport_options" "$key" "$(echo $AIRFLOW_CELERY_BROKER_TRANSPORT_OPTIONS | jq -r --compact-output ".$key")"
+    done
     # Configure celery backend
+    info "Configuring celery backend"
     local -r database_user=$(airflow_encode_url "$AIRFLOW_DATABASE_USERNAME")
     local -r database_password=$(airflow_encode_url "$AIRFLOW_DATABASE_PASSWORD")
     local database_extra_options
     is_boolean_yes "$AIRFLOW_DATABASE_USE_SSL" && database_extra_options="?sslmode=require"
     airflow_conf_set "celery" "result_backend" "db+postgresql://${database_user}:${database_password}@${AIRFLOW_DATABASE_HOST}:${AIRFLOW_DATABASE_PORT_NUMBER}/${AIRFLOW_DATABASE_NAME}${database_extra_options:-}"
 }
+
 
 ########################
 # Wait until the database is accessible
@@ -499,54 +521,4 @@ is_airflow_not_running() {
 airflow_stop() {
     info "Stopping Airflow..."
     stop_service_using_pid "$AIRFLOW_PID_FILE"
-}
-
-########################
-# Check if airflow-exporter is running
-# Globals:
-#   AIRFLOW_EXPORTER_PID_FILE
-# Arguments:
-#   None
-# Returns:
-#   Whether airflow-exporter is running
-########################
-is_airflow_exporter_running() {
-    # airflow-exporter does not create any PID file
-    # We regenerate the PID file for each time we query it to avoid getting outdated
-    pgrep -f "airflow-prometheus-exporter" | head -n 1 > "$AIRFLOW_EXPORTER_PID_FILE"
-
-    local pid
-    pid="$(get_pid_from_file "$AIRFLOW_EXPORTER_PID_FILE")"
-    if [[ -n "$pid" ]]; then
-        is_service_running "$pid"
-    else
-        false
-    fi
-}
-
-########################
-# Check if airflow-exporter is not running
-# Globals:
-#   AIRFLOW_EXPORTER_PID_FILE
-# Arguments:
-#   None
-# Returns:
-#   Whether airflow-exporter is not running
-########################
-is_airflow_exporter_not_running() {
-    ! is_airflow_exporter_running
-}
-
-########################
-# Stop airflow-exporter
-# Globals:
-#   AIRFLOW*
-# Arguments:
-#   None
-# Returns:
-#   None
-#########################
-airflow_exporter_stop() {
-    info "Stopping airflow-exporter..."
-    stop_service_using_pid "$AIRFLOW_EXPORTER_PID_FILE"
 }

@@ -16,11 +16,16 @@ set -o pipefail
 . /opt/drycc/scripts/libos.sh
 . /opt/drycc/scripts/libairflow.sh
 
-args=("--pid" "$AIRFLOW_PID_FILE" "$@")
+AIRFLOW_EXTRA_ARGS="${AIRFLOW_EXTRA_ARGS} --pid ${AIRFLOW_PID_FILE}"
+
+airflow_extra_args=("${@}")
+if ! is_empty_value "$AIRFLOW_EXTRA_ARGS"; then
+    read -r -a airflow_extra_args <<< "$AIRFLOW_EXTRA_ARGS"
+fi
 
 info "** Starting Airflow **"
 if am_i_root; then
-    exec_as_user "$AIRFLOW_DAEMON_USER" "${AIRFLOW_BIN_DIR}/airflow" "webserver" "${args[@]}"
+    exec_as_user "$AIRFLOW_DAEMON_USER" "${AIRFLOW_BIN_DIR}/airflow" "${airflow_extra_args[@]}"
 else
-    exec "${AIRFLOW_BIN_DIR}/airflow" "webserver" "${args[@]}"
+    exec "${AIRFLOW_BIN_DIR}/airflow" "${airflow_extra_args[@]}"
 fi
