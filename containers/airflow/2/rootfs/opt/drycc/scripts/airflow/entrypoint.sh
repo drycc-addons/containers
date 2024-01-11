@@ -36,7 +36,11 @@ if [[ -d "${AIRFLOW_DAGS_DIR}" ]]; then
         if [[ -f "${REQUIREMENTS_PATH}" ]]; then
             pip install -r "${REQUIREMENTS_PATH}"
         fi
-        PYTHONPATH=$PYTHONPATH:$DAG_PATH
+        if [[ "${PYTHONPATH:-}" == "" ]]; then
+            PYTHONPATH=$DAG_PATH
+        else
+            PYTHONPATH=$PYTHONPATH:$DAG_PATH
+        fi
     done
     if [[ "${PYTHONPATH:-}" != "" ]]; then
         export PYTHONPATH
