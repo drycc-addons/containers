@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright VMware, Inc.
+# Copyright Drycc Community.
 # SPDX-License-Identifier: APACHE-2.0
 #
 # Drycc custom library
