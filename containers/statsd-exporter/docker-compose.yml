@@ -1,0 +1,6 @@
+version: '2'
+services:
+  statsd-exporter:
+    image: registry.drycc.cc/drycc-addons/statsd-exporter:0
+    ports:
+    - 9102:9102

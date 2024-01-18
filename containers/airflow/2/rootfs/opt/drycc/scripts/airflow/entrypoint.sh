@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright VMware, Inc.
+# Copyright Drycc Community.
 # SPDX-License-Identifier: APACHE-2.0
 
 # shellcheck disable=SC1091
@@ -27,11 +27,24 @@ if ! am_i_root && [[ -e "$LIBNSS_WRAPPER_PATH" ]]; then
     export HOME="$AIRFLOW_HOME"
 fi
 
-# Install custom python package if requirements.txt is present
-if [[ -f "/opt/drycc/python/requirements.txt" ]]; then
-    . /opt/drycc/airflow/venv/bin/activate
-    pip install -r /opt/drycc/python/requirements.txt
-    deactivate
+# Install dags requirements
+if [[ -d "${AIRFLOW_DAGS_DIR}" ]]; then
+    for folder in $(ls "${AIRFLOW_DAGS_DIR}")
+    do
+        DAG_PATH="${AIRFLOW_DAGS_DIR}/${folder}"
+        REQUIREMENTS_PATH="${DAG_PATH}/requirements.txt"
+        if [[ -f "${REQUIREMENTS_PATH}" ]]; then
+            pip install -r "${REQUIREMENTS_PATH}"
+        fi
+        if [[ "${PYTHONPATH:-}" == "" ]]; then
+            PYTHONPATH=$DAG_PATH
+        else
+            PYTHONPATH=$PYTHONPATH:$DAG_PATH
+        fi
+    done
+    if [[ "${PYTHONPATH:-}" != "" ]]; then
+        export PYTHONPATH
+    fi
 fi
 
 if [[ "$*" = *"/opt/drycc/scripts/airflow/run.sh"* || "$*" = *"/run.sh"* ]]; then
