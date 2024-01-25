@@ -146,6 +146,13 @@ flink_prepare_configuration() {
 
     flink_configure_from_environment_variables
 
+    # Replace default REST/RPC endpoint bind address to use the container's network interface \
+    sed -i 's/rest.address: localhost/rest.address: 0.0.0.0/g' "$FLINK_CONF_FILE_PATH"; \
+    sed -i 's/rest.bind-address: localhost/rest.bind-address: 0.0.0.0/g' "$FLINK_CONF_FILE_PATH"; \
+    sed -i 's/jobmanager.bind-host: localhost/jobmanager.bind-host: 0.0.0.0/g' "$FLINK_CONF_FILE_PATH"; \
+    sed -i 's/taskmanager.bind-host: localhost/taskmanager.bind-host: 0.0.0.0/g' "$FLINK_CONF_FILE_PATH"; \
+    sed -i '/taskmanager.host: localhost/d' "$FLINK_CONF_FILE_PATH";
+
     envsubst < "${FLINK_CONF_FILE_PATH}" > "${FLINK_CONF_FILE_PATH}.tmp" && mv "${FLINK_CONF_FILE_PATH}.tmp" "${FLINK_CONF_FILE_PATH}"
 }
 
