@@ -5,7 +5,7 @@ version: '2'
 
 services:
   jobmanager:
-    image: registry.uucin.com/lijianguo/flink:1
+    image: registry.drycc.cc/drycc-addons/flink:1.18
     ports:
       - 6123:6123
       - 8081:8081
@@ -15,7 +15,7 @@ services:
       - FLINK_CFG_JOBMANAGER_BIND__HOST=0.0.0.0
       - FLINK_CFG_JOBMANAGER_RPC_ADDRESS=jobmanager
   taskmanager:
-    image: registry.uucin.com/lijianguo/flink:1
+    image: registry.drycc.cc/drycc-addons/flink:1.18
     ports:
       - 6121:6121
       - 6122:6122
