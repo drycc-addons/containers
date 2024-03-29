@@ -1,9 +1,17 @@
 ARG CODENAME
+FROM registry.drycc.cc/drycc/go-dev as BUILD
+
+ADD reids-sentinel-proxy.go /tmp
+
+RUN cd /tmp; \
+  . init-stack; \
+  go build reids-sentinel-proxy.go
+
+
 FROM registry.drycc.cc/drycc/base:${CODENAME}
 
 ENV GOSU_VERSION="1.16" \
     REDIS_SENTINEL_VERSION="7.0.12"
-
 
 COPY prebuildfs /
 
@@ -28,6 +36,7 @@ RUN install-packages libnss-wrapper \
     && mkdir -p /usr/share/man/man{1..8}
 
 COPY rootfs /
+COPY --from=BUILD /tmp/reids-sentinel-proxy /opt/drycc/redis-sentinel/bin
 RUN /opt/drycc/scripts/redis-sentinel/postunpack.sh
 
 EXPOSE 26379
