@@ -1,0 +1,7 @@
+version: '2'
+services:
+  kafka-exporter:
+    image: registry.drycc.cc/drycc-addons/kafka-exporter:1
+    command: ["--kafka.server=192.168.31.31:9092"]
+    ports:
+      - 9308:9308

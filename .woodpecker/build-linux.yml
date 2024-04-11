@@ -3,8 +3,6 @@ matrix:
     - linux/amd64
     - linux/arm64
 
-platform: ${platform}
-
 clone:
   git:
     image: docker.io/woodpeckerci/plugin-git:2.1.1
@@ -14,8 +12,9 @@ clone:
 
 labels:
   type: exec
+  platform: ${platform}
 
-pipeline:
+steps:
 - name: publish-linux
   image: bash
   commands:

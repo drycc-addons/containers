@@ -1,0 +1,28 @@
+# Copyright Drycc Community.
+# SPDX-License-Identifier: APACHE-2.0
+
+version: '2'
+
+services:
+  jobmanager:
+    image: registry.drycc.cc/drycc-addons/flink:1.18
+    ports:
+      - 6123:6123
+      - 8081:8081
+    environment:
+      - FLINK_MODE=jobmanager
+      - FLINK_CFG_REST_BIND__ADDRESS=0.0.0.0
+      - FLINK_CFG_JOBMANAGER_BIND__HOST=0.0.0.0
+      - FLINK_CFG_JOBMANAGER_RPC_ADDRESS=jobmanager
+  taskmanager:
+    image: registry.drycc.cc/drycc-addons/flink:1.18
+    ports:
+      - 6121:6121
+      - 6122:6122
+    environment:
+      - FLINK_MODE=taskmanager
+      - FLINK_CFG_JOBMANAGER_BIND__HOST=0.0.0.0
+      - FLINK_CFG_TASKMANAGER_BIND__HOST=0.0.0.0
+      - FLINK_CFG_JOBMANAGER_RPC_ADDRESS=jobmanager
+    depends_on:
+      - jobmanager
