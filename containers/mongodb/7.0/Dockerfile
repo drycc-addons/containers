@@ -27,11 +27,11 @@ RUN find / -perm /6000 -type f -exec chmod a-s {} \; || true
 COPY rootfs /
 RUN . init-stack && /opt/drycc/scripts/mongodb/postunpack.sh
 ENV APP_VERSION="7.0.8" \
-    BITNAMI_APP_NAME="mongodb" \
-    PATH="/opt/drycc/common/bin:/opt/drycc/mongodb/bin:$PATH"
+    DRYCC_APP_NAME="mongodb" \
+    PATH="/opt/drycc/mongosh/bin:/opt/drycc/yq/bin:/opt/drycc/wait-for-port/bin:/opt/drycc/render-template/bin:/opt/drycc/mongodb/bin:$PATH"
 
 EXPOSE 27017
 
 USER 1001
-ENTRYPOINT [ "init-stack", "/opt/drycc/scripts/mongodb/entrypoint.sh" ]
+ENTRYPOINT ["/opt/drycc/scripts/mongodb/entrypoint.sh" ]
 CMD [ "/opt/drycc/scripts/mongodb/run.sh" ]
