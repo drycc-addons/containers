@@ -1691,5 +1691,5 @@ mongodb_execute() {
     fi
     [[ -n "$database" ]] && args+=("$database")
 
-    "$MONGODB_BIN_DIR/mongosh" "${args[@]}"
+    "$MONGOSH_BIN_DIR/mongosh" "${args[@]}"
 }
