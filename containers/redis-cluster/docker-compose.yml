@@ -2,6 +2,8 @@ version: '2'
 services:
   redis-node-0:
     image: registry.drycc.cc/drycc-addons/redis-cluster:7.0
+    ports:
+    - 16379:6379
     volumes:
       - redis-cluster_data-0:/drycc/redis/data
     environment:
