@@ -3,7 +3,7 @@ FROM registry.drycc.cc/drycc/base:${CODENAME}
 
 ENV DRYCC_APP_NAME= \
     PATH="/opt/drycc/grafana/bin:$PATH" \
-    GRAFANA_VERSION="10.1.2"
+    GRAFANA_VERSION="10.4.2"
 
 COPY prebuildfs /
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
