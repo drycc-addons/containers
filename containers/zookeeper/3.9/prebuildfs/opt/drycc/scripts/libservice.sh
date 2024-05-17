@@ -393,7 +393,7 @@ generate_systemd_conf() {
     fi
     # Generate the Systemd unit
     cat > "$service_file" <<EOF
-# Copyright VMware, Inc.
+# Copyright Drycc Community
 # SPDX-License-Identifier: APACHE-2.0
 
 [Unit]
