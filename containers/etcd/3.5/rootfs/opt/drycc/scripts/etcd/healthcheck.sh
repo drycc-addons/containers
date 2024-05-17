@@ -1,0 +1,32 @@
+#!/bin/bash
+# Drycc Community
+# SPDX-License-Identifier: APACHE-2.0
+
+# shellcheck disable=SC1091
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# Load libraries
+. /opt/drycc/scripts/libos.sh
+. /opt/drycc/scripts/libnet.sh
+. /opt/drycc/scripts/libetcd.sh
+
+# Load etcd environment settings
+. /opt/drycc/scripts/etcd-env.sh
+
+read -r -a advertised_array <<< "$(tr ',;' ' ' <<< "$ETCD_ADVERTISE_CLIENT_URLS")"
+host="$(parse_uri "${advertised_array[0]}" "host")"
+port="$(parse_uri "${advertised_array[0]}" "port")"
+read -r -a extra_flags <<< "$(etcdctl_auth_flags)"
+extra_flags+=("--endpoints=${host}:${port}")
+if [[ $ETCD_AUTO_TLS = true ]]; then
+     extra_flags+=("--insecure-skip-tls-verify")
+fi
+if etcdctl endpoint health "${extra_flags[@]}"; then
+    exit 0
+else
+    error "Unhealthy endpoint!"
+    exit 1
+fi
