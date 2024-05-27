@@ -16,6 +16,8 @@ services:
       - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster
       - ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
+    volumes:
+      - etcd_data1:/drycc/etcd
   etcd2:
     image: registry.drycc.cc/drycc-addons/etcd:3.5
     environment:
@@ -28,6 +30,8 @@ services:
       - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster
       - ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
+    volumes:
+      - etcd_data2:/drycc/etcd
   etcd3:
     image: registry.drycc.cc/drycc-addons/etcd:3.5
     environment:
@@ -40,3 +44,12 @@ services:
       - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster
       - ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
+    volumes:
+      - etcd_data3:/drycc/etcd
+volumes:
+  etcd_data1:
+    driver: local
+  etcd_data2:
+    driver: local
+  etcd_data3:
+    driver: local
