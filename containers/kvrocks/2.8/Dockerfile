@@ -9,7 +9,6 @@ ENV DRYCC_UID=1001 \
   DRYCC_APP_NAME=kvrocks
 
 COPY prebuildfs /
-SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-c"]
 
 RUN  install-stack kvrocks ${KVROCKS_VERSION} \
   && install-stack kvrocks_exporter ${KVROCKS_EXPORTER_VERSION} \
