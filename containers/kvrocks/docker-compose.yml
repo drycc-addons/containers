@@ -69,8 +69,6 @@ services:
       - kvrocks_node3:/drycc/kvrocks
   kvrocks-node-4:
     image: registry.drycc.cc/drycc-addons/kvrocks:2.8
-    ports:
-    - 6101:6101
     environment:
       - KVROCKS_MASTERAUTH=drycc
       - KVROCKS_REQUIREPASS=drycc
@@ -107,6 +105,48 @@ services:
     depends_on:
       kvrocks-controller:
         condition: service_healthy
+
+  redis-cluster-proxy:
+    image: registry.drycc.cc/drycc-addons/kvrocks:2.8
+    depends_on:
+      - kvrocks-cluster-init
+    ports:
+     - 6379:6379
+    entrypoint: ['init-stack', '/bin/bash', '-c']
+    command:
+      - |
+        cat << EOF >> "/opt/drycc/kvrocks/etc/redis-proxy.toml"
+        [log]
+        level = "libproxy=error"                                     # "trace" "info" "debug" "warn" "error"
+        ansi = true                                                  # support ANSI colors
+        stdout = true                                                # print logs to stdout
+        directory = "/tmp"                                           # log file directory
+        file_name = "redis-cluster-proxy.log"                        # log file name
+        [metrics]
+        port = 2110
+        [[clusters]]
+        name = "redis-cluster-proxy"
+        listen_addr = "0.0.0.0:6379"
+        hash_tag = "{}"
+        thread = 1
+        cache_type = "redis_cluster"
+        servers = ["kvrocks-node-1:6101", "kvrocks-node-2:6101", "kvrocks-node-3:6101", "kvrocks-node-4:6101"]
+        fetch_interval = 1800000                                     # 1800s, 30 minutes
+        fetch_since_latest_cmd = 1000                                # 3600s, 1 hour
+        read_from_slave = false
+        ping_fail_limit = 10
+        ping_interval = 300
+        read_timeout = 1000
+        write_timeout = 1000
+        dial_timeout = 500
+        listen_proto = "tcp"
+        node_connections = 1
+        auth = "drycc"
+        EOF
+        sleep 30s
+        redis-cluster-proxy /opt/drycc/kvrocks/etc/redis-proxy.toml
+    environment:
+      - 'REDIS_PASSWORD=drycc'
 
 volumes:
   etcd_data1:
