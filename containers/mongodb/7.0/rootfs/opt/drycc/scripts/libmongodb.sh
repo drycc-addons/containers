@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright VMware, Inc.
+# Copyright Drycc Community
 # SPDX-License-Identifier: APACHE-2.0
 #
 # Drycc MongoDB library
@@ -1651,7 +1651,7 @@ mongodb_execute() {
     debug_execute mongodb_execute_print_output "$@"
 }
 
-# Copyright VMware, Inc.
+# Copyright Drycc Community
 # SPDX-License-Identifier: APACHE-2.0
 
 # shellcheck disable=SC2148
