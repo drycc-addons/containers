@@ -9,11 +9,11 @@ ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 # RUN groupadd -g $GID -o mysqlsh && useradd -m -u $UID -g $GID -o -s /bin/bash mysqlsh
 
-RUN install-packages  locales iputils-ping telnet
+RUN install-packages  locales iputils-ping telnet vim
 
 RUN install-stack mysql-shell $MYSQLSHELL_VERSION 
 
-RUN apt-get autoremove --purge -y curl && \
+RUN apt-get autoremove --purge -y && \
     apt-get update && apt-get upgrade -y && \
     apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
