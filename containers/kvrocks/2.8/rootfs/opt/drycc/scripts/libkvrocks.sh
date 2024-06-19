@@ -21,13 +21,13 @@
 #########################
 kvrocks_config_setup() {
   kvrocks_conf_set bind "$KVROCKS_BIND"
-  kvrocks_conf_set port "$KVROCKS_PORT_NUMBER"
+  kvrocks_conf_set port "$KVROCKS_PORT"
   kvrocks_conf_set masterauth "$KVROCKS_MASTERAUTH"
   kvrocks_conf_set requirepass "$KVROCKS_REQUIREPASS"
   kvrocks_conf_set dir "$KVROCKS_DATA_DIR"
   kvrocks_conf_set backup-dir "$KVROCKS_BACKUP_DIR"
   kvrocks_conf_set pidfile "$KVROCKS_PID_FILE"
-  kvrocks_conf_set cluster-enabled yes
+  kvrocks_conf_set cluster-enabled "$KVROCKS_CLUSTER_ENABLED"
 }
 
 ########################
@@ -123,8 +123,8 @@ kvrocks_validate() {
         print_validation_error "The $1 environment variable is empty or not set."
     }
 
-    if [[ -z "$KVROCKS_PORT_NUMBER" ]]; then
-        empty_environment_error KVROCKS_PORT_NUMBER
+    if [[ -z "$KVROCKS_PORT" ]]; then
+        empty_environment_error KVROCKS_PORT
     fi
 
     if [[ -z "$KVROCKS_CONTROLLER_ADDR" ]]; then
@@ -147,9 +147,31 @@ kvrocks_validate() {
 }
 
 ########################
+# Configure kvrocks configuration files from environment variables
+# Globals:
+#   KVROCKS_*
+# Arguments:
+#   None
+# Returns:
+#   None
+#########################
+kvrocks_config_from_environment_variables() {
+    # Map environment variables to config properties
+    for var in "${!KVROCKS_CFG_@}"; do
+        key="$(echo "$var" | sed -e 's/^KVROCKS_CFG_//g' -e 's/__/\-/g' | sed -e 's/^KVROCKS_CFG_//g' -e 's/_/\./g' | tr '[:upper:]' '[:lower:]')"
+        # Exception for the camel case in this environment variable
+
+        value="${!var}"
+        kvrocks_conf_set "$key" "$value"
+    done
+}
+
+
+########################
 # Initialize a configuration setting value
 #########################
 kvrocks_initialize() {
   kvrocks_config_setup
+  kvrocks_config_from_environment_variables
   kvrocks_controller_config_setup
 }
