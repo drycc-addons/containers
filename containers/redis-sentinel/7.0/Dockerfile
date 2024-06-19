@@ -1,9 +1,9 @@
 ARG CODENAME
 FROM registry.drycc.cc/drycc/go-dev as BUILD
 
-ADD redis-sentinel-proxy /reids-sentinel-proxy
+ADD redis-sentinel-proxy /redis-sentinel-proxy
 
-RUN cd /reids-sentinel-proxy; \
+RUN cd /redis-sentinel-proxy; \
   . init-stack; \
   go mod vendor; \
   go build main.go
@@ -37,7 +37,7 @@ RUN install-packages libnss-wrapper \
     && mkdir -p /usr/share/man/man{1..8}
 
 COPY rootfs /
-COPY --from=BUILD /reids-sentinel-proxy/main /opt/drycc/redis-sentinel/bin/reids-sentinel-proxy
+COPY --from=BUILD /redis-sentinel-proxy/main /opt/drycc/redis-sentinel/bin/redis-sentinel-proxy
 RUN /opt/drycc/scripts/redis-sentinel/postunpack.sh
 
 EXPOSE 26379
