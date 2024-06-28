@@ -1,0 +1,92 @@
+# Drycc Community
+# SPDX-License-Identifier: APACHE-2.0
+
+version: '2'
+
+services:
+  kvrocks-node-1:
+    image: harbor.uucin.com/lijianguo/kvrocks:2.8.0
+    container_name: kvrocks-node-1
+    ports:
+      - "6379:6379"
+    # command: kvrocks -c /etc/kvrocks/kvrocks.conf
+    environment:
+      - DRYCC_DEBUG=true
+      - KVROCKS_PORT=6379
+      - KVROCKS_BIND=0.0.0.0
+      - KVROCKS_MASTERAUTH=drycc
+      - KVROCKS_REQUIREPASS=drycc
+      - KVROCKS_DIR=/drycc/kvrocks
+      - KVROCKS_CLUSTER_ENABLED="no"
+    volumes:
+      - kvrocks_node1:/drycc/kvrocks
+  kvrocks-node-2:
+    image: harbor.uucin.com/lijianguo/kvrocks:2.8.0
+    container_name: kvrocks-node-2
+    environment:
+      - KVROCKS_PORT=6379
+      - KVROCKS_BIND=0.0.0.0
+      - KVROCKS_MASTERAUTH=drycc
+      - KVROCKS_REQUIREPASS=drycc
+      - KVROCKS_CFG_SLAVEOF="kvrocks-node-1 6379"
+      - KVROCKS_DIR=/drycc/kvrocks
+      - KVROCKS_CLUSTER_ENABLED="no"
+    ports:
+      - '6380:6379'
+    volumes:
+      - kvrocks_node2:/drycc/kvrocks
+    depends_on:
+      - kvrocks-node-1
+  kvrocks-node-3:
+    image: harbor.uucin.com/lijianguo/kvrocks:2.8.0
+    container_name: kvrocks-node-3
+    environment:
+      - KVROCKS_PORT=6379
+      - KVROCKS_BIND=0.0.0.0
+      - KVROCKS_MASTERAUTH=drycc
+      - KVROCKS_REQUIREPASS=drycc
+      - KVROCKS_CFG_SLAVEOF="kvrocks-node-1 6379"
+      - KVROCKS_DIR=/drycc/kvrocks
+      - KVROCKS_CLUSTER_ENABLED="no"
+    ports:
+      - '6381:6379'
+    volumes:
+      - kvrocks_node3:/drycc/kvrocks
+    depends_on:
+      - kvrocks-node-1
+
+  redis-sentinel:
+      image: harbor.uucin.com/lijianguo/redis-sentinel:7.0
+      environment:
+        - REDIS_MASTER_HOST=10.0.60.26
+        - REDIS_MASTER_PORT_NUMBER=6379
+        - REDIS_MASTER_SET=mymaster
+        - REDIS_PASSWORD=drycc
+        - REDIS_SENTINEL_PASSWORD=drycc
+        - REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS=8640000000
+      ports:
+        - "26379:26379"
+
+  redis-sentinel-proxy:
+      image: harbor.uucin.com/lijianguo/redis-sentinel:7.0
+      entrypoint:
+        - bash
+        - -c 
+        - |
+         echo starting;
+         /opt/drycc/redis-sentinel/bin/redis-sentinel-proxy \
+           -listen :36379 \
+           -master mymaster \
+           -sentinel-addr 10.0.60.26:26379 \
+           -sentinel-pass drycc \
+           -sentinel-user ""
+      ports:
+        - "36379:36379"
+
+volumes:
+  kvrocks_node1:
+    driver: local
+  kvrocks_node2:
+    driver: local
+  kvrocks_node3:
+    driver: local

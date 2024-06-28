@@ -24,7 +24,7 @@ export DRYCC_DEBUG="${DRYCC_DEBUG:-false}"
 # By setting an environment variable matching *_FILE to a file path, the prefixed environment
 # variable will be overridden with the value specified in that file
 kvrocks_env_vars=(
-    KVROCKS_PORT_NUMBER
+    KVROCKS_PORT
     KVROCKS_CONTROLLER_ADDR
     KVROCKS_CONTROLLER_ETCD_ADDRS
     KVROCKS_CONTROLLER_ETCD_USERNAME
@@ -74,7 +74,8 @@ export KVROCKS_DAEMON_GROUP="kvrocks"
 export KVROCKS_BIND="${KVROCKS_BIND:-0.0.0.0}"
 export KVROCKS_MASTERAUTH="${KVROCKS_MASTERAUTH:-}"
 export KVROCKS_REQUIREPASS="${KVROCKS_REQUIREPASS:-}"
-export KVROCKS_PORT_NUMBER="${KVROCKS_PORT_NUMBER:-6101}"
+export KVROCKS_PORT="${KVROCKS_PORT:-6379}"
+export KVROCKS_CLUSTER_ENABLED="${KVROCKS_CLUSTER_ENABLED:-yes}"
 
 # kvrocks controller settings
 export KVROCKS_NODES="${KVROCKS_NODES:-}"
