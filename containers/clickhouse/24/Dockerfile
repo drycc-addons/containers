@@ -5,7 +5,7 @@ ENV HOME="/" \
     OS_NAME="linux" \
     OS_FLAVOUR="debian-12" \
     OS_NAME="linux" \
-    CLICKHOUSE_VERSION="24.3.2.23" \
+    CLICKHOUSE_VERSION="24.3.4.147" \
     OS_ARCH="${TARGETARCH:-amd64}" 
 
 COPY prebuildfs /
@@ -15,7 +15,7 @@ RUN install_packages ca-certificates curl procps xmlstarlet
 RUN install-stack clickhouse ${CLICKHOUSE_VERSION}
 RUN chmod g+rwX /opt/drycc
 RUN find / -perm /6000 -type f -exec chmod a-s {} \; || true
-ENV APP_VERSION="24.3.2" \
+ENV APP_VERSION="24.3.4" \
     DRYCC_APP_NAME="clickhouse" \
     PATH="/opt/drycc/clickhouse/bin:/opt/drycc/common/bin:$PATH" \
     clickhouseCTL_API="3"
