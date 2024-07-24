@@ -4,7 +4,7 @@ FROM registry.drycc.cc/drycc/base:${CODENAME}
 ENV DRYCC_UID=1001 \
   DRYCC_GID=1001 \
   PYTHON_VERSION=3.12 \
-  FLUENT_BIT_VERSION=2.1.8
+  FLUENT_BIT_VERSION=2.0.9
 
 COPY prebuildfs /
 
