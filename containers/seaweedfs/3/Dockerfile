@@ -1,8 +1,8 @@
 ARG CODENAME
 FROM registry.drycc.cc/drycc/base:${CODENAME}
 
-ENV JQ_VERSION="1.7" \
-  SEAWEEDFS_VERSION="3.63" \
+ENV JQ_VERSION="1.7.1" \
+  SEAWEEDFS_VERSION="3.69" \
   SEAWEEDFS_DATA_DIR=/seaweedfs \
   SEAWEEDFS_CONF_DIR=/etc/seaweedfs
 
