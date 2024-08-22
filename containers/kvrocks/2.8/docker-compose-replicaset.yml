@@ -5,7 +5,7 @@ version: '2'
 
 services:
   kvrocks-node-1:
-    image: harbor.uucin.com/lijianguo/kvrocks:2.8.0
+    image: registry.drycc.cc/drycc-addons/kvrocks:2.8.0
     container_name: kvrocks-node-1
     ports:
       - "6379:6379"
@@ -21,7 +21,7 @@ services:
     volumes:
       - kvrocks_node1:/drycc/kvrocks
   kvrocks-node-2:
-    image: harbor.uucin.com/lijianguo/kvrocks:2.8.0
+    image: registry.drycc.cc/drycc-addons/kvrocks:2.8.0
     container_name: kvrocks-node-2
     environment:
       - KVROCKS_PORT=6379
@@ -38,7 +38,7 @@ services:
     depends_on:
       - kvrocks-node-1
   kvrocks-node-3:
-    image: harbor.uucin.com/lijianguo/kvrocks:2.8.0
+    image: registry.drycc.cc/drycc-addons/kvrocks:2.8.0
     container_name: kvrocks-node-3
     environment:
       - KVROCKS_PORT=6379
@@ -56,7 +56,7 @@ services:
       - kvrocks-node-1
 
   redis-sentinel:
-      image: harbor.uucin.com/lijianguo/redis-sentinel:7.0
+      image: registry.drycc.cc/drycc-addons/redis-sentinel:7.0
       environment:
         - REDIS_MASTER_HOST=10.0.60.26
         - REDIS_MASTER_PORT_NUMBER=6379
@@ -68,7 +68,7 @@ services:
         - "26379:26379"
 
   redis-sentinel-proxy:
-      image: harbor.uucin.com/lijianguo/redis-sentinel:7.0
+      image: registry.drycc.cc/drycc-addons/redis-sentinel:7.0
       entrypoint:
         - bash
         - -c 
