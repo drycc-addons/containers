@@ -73,7 +73,8 @@ def refresh_daemonset(namespace, daemonset_name):
 @click.option("--namespace", "namespace", required=True, help="k8s namespace.")
 @click.option("--daemonset-name", "daemonset_name", required=True, help="k8s daemonset name.")
 @click.option("--retry-interval", "retry_interval", show_default=True, default=60, type=int, help="k8s watch retry interval.")
-def main(namespace, daemonset_name, retry_interval):
+@click.option("--refresh-interval", "refresh_interval", show_default=True, default=1200, type=int, help="k8s max refresh interval.")
+def main(namespace, daemonset_name, retry_interval, refresh_interval):
     load_kube_config()
     core_v1_api = client.CoreV1Api()
     apps_v1_api = client.AppsV1Api()
@@ -86,18 +87,18 @@ def main(namespace, daemonset_name, retry_interval):
             [f"{key}!={value}" for key, value in daemonset.spec.selector.match_labels.items()]
         ),
     }
-    deleted_timestamp = int(time.time())
+    timestamp = 0
     while True:
         w = watch.Watch()
         try:
-            if deleted_timestamp > 0:
+            if int(time.time() - timestamp) > refresh_interval:
                 refresh_daemonset(namespace, daemonset_name)
-                deleted_timestamp = 0
+                timestamp = int(time.time())
             for event in w.stream(core_v1_api.list_namespaced_pod, **kwargs):
                 node_name = event['object'].spec.node_name
                 if node_name:
                     if event['type'] in ("ADDED", "MODIFIED", "DELETED"):
-                        deleted_timestamp = int(time.time())
+                        timestamp = 0
         except Exception as ex:
             logger.exception(ex)
             w.stop()
