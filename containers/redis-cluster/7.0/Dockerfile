@@ -3,14 +3,15 @@ FROM registry.drycc.cc/drycc/base:${CODENAME}
 
 ENV GOSU_VERSION="1.16" \
     REDIS_VERSION="7.0.12" \
-    REDIS_CLUSTER_PROXY_VERSION="1.0.23"
+    VALKEY_CLUSTER_PROXY_VERSION="1.1.3"
 
 COPY prebuildfs /
 
 RUN install-packages libnss-wrapper \
     && install-stack gosu $GOSU_VERSION \
     && install-stack redis $REDIS_VERSION \
-    && install-stack redis-cluster-proxy $REDIS_CLUSTER_PROXY_VERSION \
+    && install-stack valkey-cluster-proxy $VALKEY_CLUSTER_PROXY_VERSION \
+    && ln -s /opt/drycc/valkey-cluster-proxy/bin/valkey-cluster-proxy /opt/drycc/valkey-cluster-proxy/bin/redis-cluster-proxy \
     && echo "export NSS_WRAPPER_LIB=/usr/lib/`echo $(uname -m)`-linux-gnu/libnss_wrapper.so" >> /opt/drycc/redis/profile.d/redis.sh \
     && . init-stack \
     && rm -rf \
