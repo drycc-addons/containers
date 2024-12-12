@@ -3,7 +3,7 @@ FROM registry.drycc.cc/drycc/base:${CODENAME}
 
 ENV GOSU_VERSION="1.16" \
     REDIS_VERSION="7.0.12" \
-    VALKEY_CLUSTER_PROXY_VERSION="1.1.4"
+    VALKEY_CLUSTER_PROXY_VERSION="1.2.1"
 
 COPY prebuildfs /
 
