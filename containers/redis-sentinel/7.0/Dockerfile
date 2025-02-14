@@ -1,24 +1,17 @@
 ARG CODENAME
-FROM registry.drycc.cc/drycc/go-dev as BUILD
-
-ADD redis-sentinel-proxy /redis-sentinel-proxy
-
-RUN cd /redis-sentinel-proxy; \
-  . init-stack; \
-  go mod vendor; \
-  go build main.go
-
 
 FROM registry.drycc.cc/drycc/base:${CODENAME}
 
 ENV GOSU_VERSION="1.16" \
-    REDIS_SENTINEL_VERSION="7.0.12"
+    REDIS_SENTINEL_VERSION="7.0.12" \
+    VALKEY_SENTINEL_PROXY_VERSION="1.0.1"
 
 COPY prebuildfs /
 
 RUN install-packages libnss-wrapper \
     && install-stack gosu $GOSU_VERSION \
     && install-stack redis-sentinel $REDIS_SENTINEL_VERSION \
+    && install-stack valkey-sentinel-proxy $VALKEY_SENTINEL_PROXY_VERSION \
     && echo "export NSS_WRAPPER_LIB=/usr/lib/`echo $(uname -m)`-linux-gnu/libnss_wrapper.so" >> /opt/drycc/redis-sentinel/profile.d/redis-sentinel.sh \
     && . init-stack \
     && rm -rf \
@@ -37,7 +30,7 @@ RUN install-packages libnss-wrapper \
     && mkdir -p /usr/share/man/man{1..8}
 
 COPY rootfs /
-COPY --from=BUILD /redis-sentinel-proxy/main /opt/drycc/redis-sentinel/bin/redis-sentinel-proxy
+RUN ln -s /opt/drycc/valkey-sentinel-proxy/bin/valkey-sentinel-proxy /opt/drycc/redis-sentinel/bin/redis-sentinel-proxy
 RUN /opt/drycc/scripts/redis-sentinel/postunpack.sh
 
 EXPOSE 26379

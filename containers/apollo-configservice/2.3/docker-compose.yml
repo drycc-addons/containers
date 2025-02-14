@@ -1,0 +1,10 @@
+# Copyright Drycc Community.
+# SPDX-License-Identifier: APACHE-2.0
+
+version: '2'
+
+services:
+  jobmanager:
+    image:  registry.drycc.cc/drycc-addons/apollo-configservice:2.3
+    ports:
+      - 8080:8080
