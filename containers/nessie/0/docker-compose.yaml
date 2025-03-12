@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+
+  nessie:
+    # IMPORTANT: when upgrading Nessie images, make sure to update the spark-sql packages as well
+    image: xxxx/nessie:0.103.0
+    ports:
+      # API port
+      - "19120:19120"
+      # Management port (metrics and health checks)
+      - "9000:9000"
+    environment:
+      # Version store settings.
+      # This example uses Postgres as the version store.
+      - nessie.version.store.type=JDBC
+      - nessie.version.store.persist.jdbc.datasource=postgresql
+      - quarkus.datasource.postgresql.jdbc.url=jdbc:postgresql://xxxx:5432/db
+      - quarkus.datasource.postgresql.username=pguser
+      - quarkus.datasource.postgresql.password=pgpasswd
+      # AuthN settings.
+      # This examples uses Keycloak for authentication.
+      - nessie.server.authentication.enabled=false
+      - quarkus.oidc.auth-server-url=http://keycloak:8080/realms/data-lake
+      - quarkus.oidc.client-id=nessie-client
+      # Web UI  
+      - quarkus.oidc.ui-app.auth-server-url=http://keycloak:8080/realms/data-lake
+      - quarkus.oidc.ui-app.client-id=nessie-app
+      - quarkus.oidc.ui-app.application-type=web-app
+      - quarkus.oidc.ui-app.tenant-paths=/,/tree*,/content*,/notfound*,/commits*
+ 
+      # Object store settings.
+      # This example uses MinIO as the object store.
+      - nessie.catalog.default-warehouse=warehouse
+      - nessie.catalog.warehouses.warehouse.location=s3://demobucket/
+      - nessie.catalog.service.s3.default-options.region=us-east-1
+      - nessie.catalog.service.s3.default-options.path-style-access=true
+      - nessie.catalog.service.s3.default-options.access-key=urn:nessie-secret:quarkus:nessie.catalog.secrets.access-key
+      - nessie.catalog.secrets.access-key.name=miniouser
+      - nessie.catalog.secrets.access-key.secret=miniouser
+      # MinIO endpoint
+      - nessie.catalog.service.s3.default-options.endpoint=http://xxxx:9000/
+      # OpenTelemetry settings.
+      # This example uses Jaeger as the OpenTelemetry traces collector.
+      # Authorization settings.
+      # In this example, Nessie is configured with 3 clients and 3 rules:
+      # - client1: can access all namespaces
+      # - client2: can access all namespaces except 'sales'
+      # - client3: can access all namespaces except 'eng'
+      #- nessie.server.authorization.enabled=true
+      #- nessie.server.authorization.rules.client1=role=='service-account-client1'
+      #- nessie.server.authorization.rules.client2=role=='service-account-client2' && !path.startsWith('sales')
+      #- nessie.server.authorization.rules.client3=role=='service-account-client3' && !path.startsWith('eng')
+    healthcheck:
+      test: "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /q/health HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'"
+      interval: 5s
+      timeout: 2s
+      retries: 15
+    extra_hosts:
+      - "keycloak:xxxx"
