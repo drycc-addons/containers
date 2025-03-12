@@ -3,7 +3,7 @@ version: '3'
 services:
 
   nessie:
-    # IMPORTANT: when upgrading Nessie images, make sure to update the spark-sql packages as well
+    # IMPORTANT: when upgrading Nessie images, make sure to update the nessie-sql packages as well
     image: xxxx/nessie:0.103.0
     ports:
       # API port

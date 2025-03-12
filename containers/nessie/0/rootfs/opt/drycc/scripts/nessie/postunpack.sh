@@ -6,15 +6,15 @@
 
 # Load libraries
 . /opt/drycc/scripts/libfs.sh
-. /opt/drycc/scripts/libspark.sh
+. /opt/drycc/scripts/libnessie.sh
 
-# Load Spark environment settings
-. /opt/drycc/scripts/spark-env.sh
+# Load NESSIE environment settings
+. /opt/drycc/scripts/nessie-env.sh
 
-for dir in "$SPARK_TMP_DIR" "$SPARK_LOG_DIR" "$SPARK_CONF_DIR" "$SPARK_WORK_DIR" "$SPARK_JARS_DIR"; do
+for dir in "$NESSIE_TMP_DIR" "$NESSIE_LOG_DIR" "$NESSIE_CONF_DIR" "$NESSIE_WORK_DIR" "$NESSIE_JARS_DIR"; do
     ensure_dir_exists "$dir"
     configure_permissions_ownership "$dir" -d "775" -f "664" -g "root"
 done
 
 # Set correct owner in installation directory
-chown -R "1001:root" "$SPARK_BASE_DIR"
+chown -R "1001:root" "$NESSIE_BASE_DIR"

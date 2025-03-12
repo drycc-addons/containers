@@ -10,30 +10,30 @@ set -o pipefail
 #set -o xtrace
 
 # Load libraries
-. /opt/drycc/scripts/libspark.sh
+. /opt/drycc/scripts/libnessie.sh
 
-# Load Spark environment settings
-. /opt/drycc/scripts/spark-env.sh
+# Load NESSIE environment settings
+. /opt/drycc/scripts/nessie-env.sh
 
 if [ ! $EUID -eq 0 ] && [ -e "$NSS_WRAPPER_LIB" ]; then
-    echo "spark:x:$(id -u):$(id -g):Spark:$SPARK_HOME:/bin/false" > "$NSS_WRAPPER_PASSWD"
-    echo "spark:x:$(id -g):" > "$NSS_WRAPPER_GROUP"
+    echo "nessie:x:$(id -u):$(id -g):NESSIE:$NESSIE_HOME:/bin/false" > "$NSS_WRAPPER_PASSWD"
+    echo "nessie:x:$(id -g):" > "$NSS_WRAPPER_GROUP"
 fi
 
-if [[ "$1" = "/opt/drycc/scripts/spark/run.sh" ]]; then
-    info "** Starting Spark setup **"
-    /opt/drycc/scripts/spark/setup.sh
-    info "** Spark setup finished! **"
+if [[ "$1" = "/opt/drycc/scripts/nessie/run.sh" ]]; then
+    info "** Starting NESSIE setup **"
+    /opt/drycc/scripts/nessie/setup.sh
+    info "** NESSIE setup finished! **"
 fi
 
-# Spark has an special 'driver' command which is an alias for spark-submit
-# https://github.com/apache/spark/blob/master/resource-managers/kubernetes/docker/src/main/dockerfiles/spark/entrypoint.sh
+# NESSIE has an special 'driver' command which is an alias for nessie-submit
+# https://github.com/apache/nessie/blob/master/resource-managers/kubernetes/docker/src/main/dockerfiles/nessie/entrypoint.sh
 
 set -o pipefail
 
 CMD=(
   "${JAVA_HOME}/bin/java"
-  "${SPARK_EXECUTOR_JAVA_OPTS[@]}"
+  "${NESSIE_EXECUTOR_JAVA_OPTS[@]}"
 )
 
 echo ""

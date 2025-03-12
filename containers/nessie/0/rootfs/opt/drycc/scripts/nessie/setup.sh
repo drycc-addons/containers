@@ -12,19 +12,19 @@ set -o pipefail
 # Load libraries
 . /opt/drycc/scripts/libos.sh
 . /opt/drycc/scripts/libfs.sh
-. /opt/drycc/scripts/libspark.sh
+. /opt/drycc/scripts/libnessie.sh
 
-# Load Spark environment settings
-. /opt/drycc/scripts/spark-env.sh
+# Load NESSIE environment settings
+. /opt/drycc/scripts/nessie-env.sh
 
-# Ensure Spark environment variables settings are valid
-spark_validate
+# Ensure NESSIE environment variables settings are valid
+nessie_validate
 
-# Ensure 'spark' user exists when running as 'root'
-am_i_root && ensure_user_exists "$SPARK_DAEMON_USER" --group "$SPARK_DAEMON_GROUP"
+# Ensure 'nessie' user exists when running as 'root'
+am_i_root && ensure_user_exists "$NESSIE_DAEMON_USER" --group "$NESSIE_DAEMON_GROUP"
 
-# Ensure Spark is initialized
-spark_initialize
+# Ensure NESSIE is initialized
+nessie_initialize
 
 # Run custom initialization scripts
-spark_custom_init_scripts
+nessie_custom_init_scripts
