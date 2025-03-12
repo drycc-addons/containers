@@ -12,7 +12,7 @@ Trademarks: This software listing is packaged by drycc. The respective trademark
 ## TL;DR
 
 ```console
-docker run --name rabbitmq quay.io/drycc-addons/rabbitmq:3.12.2
+docker run --name rabbitmq quay.io/drycc-addons/rabbitmq:4.0
 ```
 
 ### Docker Compose
@@ -29,7 +29,7 @@ You can find the default credentials and available configuration options in the 
 The recommended way to get the Bitnami Redis(TM) Docker Image is to pull the prebuilt image from the [Container Image Registry](https://quay.io/repository/drycc-addons/rabbitmq).
 
 ```console
-docker pull quay.io/drycc-addons/rabbitmq:3.12.2
+docker pull quay.io/drycc-addons/rabbitmq:4.0
 ```
 
 To use a specific version, you can pull a versioned tag. You can view the [list of available versions](https://quay.io/repository/drycc-addons/rabbitmq?tab=tags) in the Container Image Registry.
@@ -41,7 +41,7 @@ docker pull quay.io/drycc-addons/rabbitmq:[TAG]
 If you wish, you can also build the image yourself by cloning the repository, changing to the directory containing the Dockerfile and executing the `docker build` command. Remember to replace the `APP`, `VERSION` and `OPERATING-SYSTEM` path placeholders in the example command below with the correct values.
 
 ```console
-$ docker build --build-arg="CODENAME=bookworm" -t quay.io/drycc-addons/rabbitmq 'https://github.com/drycc-addons/containers.git#main:containers/rabbitmq/3.12'
+$ docker build --build-arg="CODENAME=bookworm" -t quay.io/drycc-addons/rabbitmq 'https://github.com/drycc-addons/containers.git#main:containers/rabbitmq/4.0'
 ```
 
 ## Persisting your application
@@ -53,7 +53,7 @@ For persistence you should mount a directory at the `/drycc/rabbitmq/mnesia` pat
 ```console
 docker run \
     -v /path/to/rabbitmq-persistence:/drycc/rabbitmq/mnesia \
-    quay.io/drycc-addons/rabbitmq:3.12.2
+    quay.io/drycc-addons/rabbitmq:4.0
 ```
 
 > NOTE: As this is a non-root container, the mounted files and directories must have the proper permissions for the UID `1001`.
@@ -81,7 +81,7 @@ Use the `--network app-tier` argument to the `docker run` command to attach the 
 ```console
 docker run -d --name rabbitmq-server \
     --network app-tier \
-    quay.io/drycc-addons/rabbitmq:3.12.2
+    quay.io/drycc-addons/rabbitmq:4.0
 ```
 
 #### Step 3: Launch your RabbitMQ client instance
@@ -91,7 +91,7 @@ Finally we create a new container instance to launch the RabbitMQ client and con
 ```console
 docker run -it --rm \
     --network app-tier \
-    quay.io/drycc-addons/rabbitmq:3.12.2 rabbitmqctl -n rabbit@rabbitmq-server status
+    quay.io/drycc-addons/rabbitmq:4.0 rabbitmqctl -n rabbit@rabbitmq-server status
 ```
 
 ### Using a Docker Compose file
@@ -107,7 +107,7 @@ networks:
 
 services:
   rabbitmq:
-    image: 'quay.io/drycc-addons/rabbitmq:3.12.2'
+    image: 'quay.io/drycc-addons/rabbitmq:4.0'
     networks:
       - app-tier
   myapp:
@@ -216,7 +216,7 @@ version: '2'
 
 services:
   stats:
-    image: quay.io/drycc-addons/rabbitmq:3.12.2
+    image: quay.io/drycc-addons/rabbitmq:4.0
     environment:
       - RABBITMQ_NODE_TYPE=stats
       - RABBITMQ_NODE_NAME=rabbit@stats
@@ -235,7 +235,7 @@ Update the definitions for nodes you want your RabbitMQ stats node cluster with.
 
 ```yaml
   queue-disc1:
-    image:quay.io/drycc-addons/rabbitmq:3.12.2
+    image:quay.io/drycc-addons/rabbitmq:4.0
     environment:
       - RABBITMQ_NODE_TYPE=queue-disc
       - RABBITMQ_NODE_NAME=rabbit@queue-disc1
@@ -251,7 +251,7 @@ We are going to add a ram node too:
 
 ```yaml
   queue-ram1:
-    image: quay.io/drycc-addons/rabbitmq:3.12.2
+    image: quay.io/drycc-addons/rabbitmq:4.0
     environment:
       - RABBITMQ_NODE_TYPE=queue-ram
       - RABBITMQ_NODE_NAME=rabbit@queue-ram1
@@ -280,7 +280,7 @@ version: '2'
 
 services:
   stats:
-    image: quay.io/drycc-addons/rabbitmq:3.12.2
+    image: quay.io/drycc-addons/rabbitmq:4.0
     environment:
       - RABBITMQ_NODE_TYPE=stats
       - RABBITMQ_NODE_NAME=rabbit@stats
@@ -290,7 +290,7 @@ services:
     volumes:
       - 'rabbitmqstats_data:/drycc/rabbitmq/mnesia'
   queue-disc1:
-    image: quay.io/drycc-addons/rabbitmq:3.12.2
+    image: quay.io/drycc-addons/rabbitmq:4.0
     environment:
       - RABBITMQ_NODE_TYPE=queue-disc
       - RABBITMQ_NODE_NAME=rabbit@queue-disc1
@@ -299,7 +299,7 @@ services:
     volumes:
       - 'rabbitmqdisc1_data:/drycc/rabbitmq/mnesia'
   queue-ram1:
-    image: quay.io/drycc-addons/rabbitmq:3.12.2
+    image: quay.io/drycc-addons/rabbitmq:4.0
     environment:
       - RABBITMQ_NODE_TYPE=queue-ram
       - RABBITMQ_NODE_NAME=rabbit@queue-ram1
@@ -334,7 +334,7 @@ listeners.tcp.default=1337
 ```console
 docker run -d --name rabbitmq-server \
    -v /path/to/custom.conf:/drycc/rabbitmq/conf/custom.conf:ro \
-    quay.io/drycc-addons/rabbitmq:3.12.2
+    quay.io/drycc-addons/rabbitmq:4.0
 ```
 
 After that, your changes will be taken into account in the server's behaviour.
@@ -399,7 +399,7 @@ docker run --name rabbitmq \
   --env RABBITMQ_LDAP_USER_DN_PATTERN=cn=$${username},ou=users,dc=example,dc=org \
   --network app-tier \
   -v /path/to/your/advanced.config:/drycc/rabbitmq/conf/advanced.config:ro \
-  quay.io/drycc-addons/rabbitmq:3.12.2
+  quay.io/drycc-addons/rabbitmq:4.0
 ```
 
 ## Logging
@@ -427,11 +427,11 @@ drycc provides up-to-date versions of RabbitMQ, including security patches, soon
 #### Step 1: Get the updated image
 
 ```console
-docker pull quay.io/drycc-addons/rabbitmq:3.12.2
+docker pull quay.io/drycc-addons/rabbitmq:4.0
 ```
 
 or if you're using Docker Compose, update the value of the image property to
-`quay.io/drycc-addons/rabbitmq:3.12.2`.
+`quay.io/drycc-addons/rabbitmq:4.0`.
 
 #### Step 2: Stop and backup the currently running container
 
@@ -470,7 +470,7 @@ docker-compose rm -v rabbitmq
 Re-create your container from the new image.
 
 ```console
-docker run --name rabbitmq quay.io/drycc-addons/rabbitmq:3.12.2
+docker run --name rabbitmq quay.io/drycc-addons/rabbitmq:4.0
 ```
 
 or using Docker Compose:
