@@ -1,7 +1,7 @@
 ARG CODENAME
 FROM registry.drycc.cc/drycc/base:${CODENAME}
 
-ENV LAKEFS_VERSION="1.53.0" 
+ENV LAKEFS_VERSION="1.52.0" 
 
 RUN install-stack lakefs $LAKEFS_VERSION
 
