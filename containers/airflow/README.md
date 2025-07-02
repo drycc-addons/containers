@@ -325,12 +325,8 @@ The Airflow instance can be customized by specifying environment variables on th
 * `AIRFLOW_DATABASE_USERNAME`: Database user that Airflow will use to connect with the database. Default: **bn_airflow**
 * `AIRFLOW_DATABASE_PASSWORD`: Database password that Airflow will use to connect with the database. No defaults.
 * `AIRFLOW_DATABASE_USE_SSL`: Set to yes if the database is using SSL. Default: **no**
-* `AIRFLOW_REDIS_USE_SSL`: Set to yes if Redis(R) uses SSL. Default: **no**
-* `REDIS_HOST`: Hostname for Redis(R) server. Default: **redis**
-* `REDIS_PORT_NUMBER`: Port used by Redis(R) server. Default: **6379**
-* `REDIS_USER`: User that Airflow will use to connect with Redis(R). No defaults.
-* `REDIS_PASSWORD`: Password that Airflow will use to connect with Redis(R). No defaults.
-* `REDIS_DATABASE`: Database number for Redis(R) server. Default: **1**
+* `AIRFLOW_CELERY_BROKER_URL`: Set to celery broker url. . No defaults.
+* `AIRFLOW_CELERY_BROKER_TRANSPORT_OPTIONS`: Set to celery broker transport option. . No defaults.
 
 #### Airflow LDAP authentication
 
