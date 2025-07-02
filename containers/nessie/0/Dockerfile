@@ -1,7 +1,7 @@
 ARG CODENAME
 FROM registry.drycc.cc/drycc/base:${CODENAME}
 
-ENV NESSIE_VERSION="0.103.0" \
+ENV NESSIE_VERSION="0.104.2" \
   JAVA_VERSION="21.0.6"
 
 COPY prebuildfs /
