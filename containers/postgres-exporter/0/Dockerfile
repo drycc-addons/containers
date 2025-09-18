@@ -1,7 +1,7 @@
 ARG CODENAME
 FROM registry.drycc.cc/drycc/base:${CODENAME}
 
-ENV POSTGRES_EXPORTER_VERSION="0.15.0"
+ENV POSTGRES_EXPORTER_VERSION="0.17.1"
 
 RUN install-packages libnss-wrapper \
     && install-stack postgres_exporter $POSTGRES_EXPORTER_VERSION \
