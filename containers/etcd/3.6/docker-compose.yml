@@ -1,0 +1,15 @@
+# Drycc Community
+# SPDX-License-Identifier: APACHE-2.0
+
+version: '2'
+
+services:
+  etcd:
+    image: registry.drycc.cc/drycc-addons/etcd:3.6
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+    volumes:
+      - etcd_data:/drycc/etcd
+volumes:
+  etcd_data:
+    driver: local
