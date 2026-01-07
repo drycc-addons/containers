@@ -1,0 +1,20 @@
+# Copyright Drycc Community
+# SPDX-License-Identifier: APACHE-2.0
+
+version: '2'
+
+services:
+  mongodb:
+    container_name: mongodb
+    restart: unless-stopped
+    image: registry.drycc.cc/drycc-addons/mongodb:8.0
+    environment:
+      - MONGODB_ROOT_PASSWORD=YourSecurePassword123!
+    ports:
+      - "27017:27017"
+    volumes:
+      - 'mongodb_data:/drycc/mongodb'
+
+volumes:
+  mongodb_data:
+    driver: local
