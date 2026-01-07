@@ -5,7 +5,7 @@ version: '2'
 
 services:
   etcd1:
-    image: registry.drycc.cc/drycc-addons/etcd:3.5
+    image: registry.drycc.cc/drycc-addons/etcd:3.6
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_NAME=etcd1
@@ -19,7 +19,7 @@ services:
     volumes:
       - etcd_data1:/drycc/etcd
   etcd2:
-    image: registry.drycc.cc/drycc-addons/etcd:3.5
+    image: registry.drycc.cc/drycc-addons/etcd:3.6
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_NAME=etcd2
@@ -33,7 +33,7 @@ services:
     volumes:
       - etcd_data2:/drycc/etcd
   etcd3:
-    image: registry.drycc.cc/drycc-addons/etcd:3.5
+    image: registry.drycc.cc/drycc-addons/etcd:3.6
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_NAME=etcd3
