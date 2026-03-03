@@ -5,7 +5,11 @@ version: '2'
 
 services:
   mongodb:
-    image: docker.io/drycc/mongodb:7.0
+    container_name: mongodb
+    restart: unless-stopped
+    image: registry.drycc.cc/drycc-addons/mongodb:7.0
+    environment:
+      - MONGODB_ROOT_PASSWORD=YourSecurePassword123!
     ports:
       - "27017:27017"
     volumes:
