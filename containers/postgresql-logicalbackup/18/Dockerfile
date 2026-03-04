@@ -7,7 +7,7 @@ ENV PG_MAJOR=18 \
 ENV PGDATA=$HOME/$PG_MAJOR/data \
     PGHOME=$HOME \
     MC_VERSION="2025.08.13.08.35.41"
-# Install postgresql && mc
+# Install postgresql &&  mc
 RUN . init-stack && install-stack postgresql $PG_MAJOR.$PG_MINOR \
     && install-stack mc $MC_VERSION \ 
     && install-packages pigz
