@@ -7,7 +7,7 @@ ENV PG_MAJOR=18 \
   HOME=/opt/drycc/postgresql 
 ENV PGDATA=$HOME/$PG_MAJOR/data \
   PGHOME=$HOME
-# Install postgresql && wal-g
+# Install postgresql &&  wal-g
 RUN . init-stack && install-stack postgresql $PG_MAJOR.$PG_MINOR \
   && install-stack wal-g $WALG_VERSION \
   && export DEBIAN_FRONTEND=noninteractive \
