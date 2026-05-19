@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright Drycc Community
+# Copyright DRYCC Community. All Rights Reserved.
 # SPDX-License-Identifier: APACHE-2.0
 #
 # Drycc MySQL library
@@ -26,41 +26,43 @@
 #########################
 mysql_extra_flags() {
     local randNumber
+    local nodeSuffix
+    local randomPrefix
     local -a dbExtraFlags=()
     # shellcheck disable=SC2153
     read -r -a userExtraFlags <<< "$DB_EXTRA_FLAGS"
 
     if [[ -n "$DB_REPLICATION_MODE" ]]; then
         # Simplified server-id generation: [random 2-digit] + [hostname_last_digit]
-        # Format: random number from 10-99 concatenated with host suffix digit 1-9
+        # Format: random number from 10-99 concatenated with host suffix digit
         # Extract numeric suffix (last char) from HOSTNAME: helmbroker-mysql-{1,2,3}
-        local nodeSuffix="${HOSTNAME: -1}"
+        nodeSuffix="${HOSTNAME: -1}"
         
         # Convert last char of hostname suffix, and prevent "xx0" patterns
         if [[ ! "$nodeSuffix" =~ ^[0-9]$ ]]; then
             nodeSuffix="1"
         elif [[ "$nodeSuffix" == "0" ]]; then
-            nodeSuffix="7"  # Replace 0 with unique digit that isn't special
+            nodeSuffix="7"  # Replace 0 with unique digit
         fi
 
         # Simple way to generate random 2-digit prefix between [10, 99]:
         # $RANDOM % 90 generates [0, 89], adding 10 gives us exactly the range [10, 99]
-        local randomPrefix=$(( ($RANDOM % 90) + 10 ))
+        randomPrefix=$(( ($RANDOM % 90) + 10 ))
         
-        # Combine to form three-digit id like 45{1,2..} for different STS pods
+        # Combine to form three-digit id for different STS pods like 45{1,2..}
         randNumber="${randomPrefix}${nodeSuffix}"
         
-        # Use generated id in replication settings
         dbExtraFlags+=("--server-id=$randNumber" "--log-bin=mysql-bin" "--sync-binlog=1")
         if [[ "$DB_REPLICATION_MODE" = "slave" ]]; then
-            dbExtraFlags+=("--relay-log=mysql-relay-bin" "--log-slave-updates=1" "--read-only=1")
+            dbExtraFlags+=("--relay-log=mysql-relay-bin" "--log-replica-updates=1" "--read-only=1")
+            # MySQL 8.x+.TABLE Repository
             if [[ "$DB_FLAVOR" = "mysql" ]]; then
                 dbExtraFlags+=("--master-info-repository=TABLE" "--relay-log-info-repository=TABLE")
             fi
         elif [[ "$DB_REPLICATION_MODE" = "master" ]]; then
             dbExtraFlags+=("--innodb_flush_log_at_trx_commit=1")
         fi
-    fi 
+    fi
 
     [[ "${#userExtraFlags[@]}" -eq 0 ]] || dbExtraFlags+=("${userExtraFlags[@]}")
 
@@ -181,7 +183,6 @@ log_error=${DB_LOGS_DIR}/mysqld.log
 slow_query_log=${DB_ENABLE_SLOW_QUERY}
 long_query_time=${DB_LONG_QUERY_TIME}
 character_set_server=${DB_DEFAULT_CHARACTER_SET}
-collation_server=${DB_DEFAULT_COLLATE}
 plugin_dir=${DB_BASE_DIR}/lib/plugin
 datadir=${DB_DATA_DIR}
 
@@ -196,6 +197,51 @@ port=${DB_DEFAULT_PORT_NUMBER}
 socket=${DB_SOCKET_FILE}
 pid_file=${DB_PID_FILE}
 EOF
+}
+
+########################
+# Make a dump on master database and update slave database
+# Globals:
+#   DB_*
+# Arguments:
+#   None
+# Returns:
+#   None
+#########################
+mysql_exec_initial_dump() {
+    local -r dump_file="${DB_DATA_DIR}/dump_all_databases.sql"
+
+    info "MySQL dump master data start..."
+    mysqldump --verbose --single-transaction --quick --source-data=2 --all-databases -h "$DB_MASTER_HOST" -P "$DB_MASTER_PORT_NUMBER" -u "$DB_MASTER_ROOT_USER" -p"$DB_MASTER_ROOT_PASSWORD" > "$dump_file"
+    debug "Finish dump databases"
+
+    # Look for the line containing "CHANGE REPLICATION SOURCE"
+    while IFS= read -r line; do
+      if [[ "$line" =~ CHANGE\ REPLICATION\ SOURCE\ TO\ SOURCE_LOG_FILE=\'([^\']+)\'\,\ SOURCE_LOG_POS=([0-9]+)\; ]]; then
+        log_file="${BASH_REMATCH[1]}"
+        log_position="${BASH_REMATCH[2]}"
+        break
+      fi
+    done < "$dump_file"
+    debug "File: $log_file and Position: $log_position"
+
+    debug "Start import dump databases"
+    mysql_execute < "$dump_file"
+    mysql_execute "mysql" <<EOF
+CHANGE REPLICATION SOURCE TO SOURCE_HOST='$DB_MASTER_HOST',
+SOURCE_PORT=$DB_MASTER_PORT_NUMBER,
+SOURCE_USER='$DB_REPLICATION_USER',
+SOURCE_PASSWORD='$DB_REPLICATION_PASSWORD',
+SOURCE_DELAY=$DB_MASTER_DELAY,
+SOURCE_LOG_FILE='$log_file',
+SOURCE_LOG_POS=$log_position,
+SOURCE_CONNECT_RETRY=10,
+GET_SOURCE_PUBLIC_KEY=1;
+EOF
+    debug "Finish import dump databases"
+
+    rm -f "$dump_file"
+    info "MySQL dump master data finish..."
 }
 
 ########################
@@ -214,16 +260,23 @@ mysql_configure_replication() {
         while ! echo "select 1" | mysql_remote_execute "$DB_MASTER_HOST" "$DB_MASTER_PORT_NUMBER" "mysql" "$DB_MASTER_ROOT_USER" "$DB_MASTER_ROOT_PASSWORD"; do
             sleep 1
         done
-        debug "Replication master ready!"
-        debug "Setting the master configuration"
-        mysql_execute "mysql" <<EOF
-CHANGE MASTER TO MASTER_HOST='$DB_MASTER_HOST',
-MASTER_PORT=$DB_MASTER_PORT_NUMBER,
-MASTER_USER='$DB_REPLICATION_USER',
-MASTER_PASSWORD='$DB_REPLICATION_PASSWORD',
-MASTER_DELAY=$DB_MASTER_DELAY,
-MASTER_CONNECT_RETRY=10;
+
+        if [[ "$DB_REPLICATION_SLAVE_DUMP" = "true" ]]; then
+            mysql_exec_initial_dump
+        else
+            debug "Replication master ready!"
+            debug "Setting the master configuration"
+            mysql_execute "mysql" <<EOF
+CHANGE REPLICATION SOURCE TO SOURCE_HOST='$DB_MASTER_HOST',
+SOURCE_PORT=$DB_MASTER_PORT_NUMBER,
+SOURCE_USER='$DB_REPLICATION_USER',
+SOURCE_PASSWORD='$DB_REPLICATION_PASSWORD',
+SOURCE_DELAY=$DB_MASTER_DELAY,
+SOURCE_CONNECT_RETRY=10,
+GET_SOURCE_PUBLIC_KEY=1;
 EOF
+
+        fi
     elif [[ "$DB_REPLICATION_MODE" = "master" ]]; then
         info "Configuring replication in master node"
         if [[ -n "$DB_REPLICATION_USER" ]]; then
@@ -248,25 +301,54 @@ mysql_ensure_replication_user_exists() {
 
     debug "Configure replication user credentials"
     mysql_execute "mysql" "$DB_ROOT_USER" "$DB_ROOT_PASSWORD" <<EOF
-set sql_log_bin=0;
+create user '$user'@'%' $([ "$password" != "" ] && echo "identified by \"$password\"");
 EOF
-    if [[ "$DB_FLAVOR" = "mariadb" ]]; then
-        mysql_execute "mysql" "$DB_ROOT_USER" "$DB_ROOT_PASSWORD" <<EOF
-create or replace user '$user'@'%' $([ "$password" != "" ] && echo "identified by \"$password\"");
-EOF
-    else
-        mysql_execute "mysql" "$DB_ROOT_USER" "$DB_ROOT_PASSWORD" <<EOF
-create user if not exists '$user'@'%' $([ "$password" != "" ] && echo "identified with 'caching_sha2_password' by \"$password\"");
-EOF
-    fi
+
     mysql_execute "mysql" "$DB_ROOT_USER" "$DB_ROOT_PASSWORD" <<EOF
 grant REPLICATION SLAVE on *.* to '$user'@'%' with grant option;
 flush privileges;
 EOF
+}
 
-mysql_execute "mysql" "$DB_ROOT_USER" "$DB_ROOT_PASSWORD" <<EOF
-set sql_log_bin=1;
-EOF
+########################
+# Initialize database data
+# Globals:
+#   DRYCC_DEBUG
+#   DB_*
+# Arguments:
+#   None
+# Returns:
+#   None
+#########################
+mysql_install_db() {
+    local command="${DB_BIN_DIR}/mysql_install_db"
+    local -a args=("--defaults-file=${DB_CONF_FILE}" "--basedir=${DB_BASE_DIR}" "--datadir=${DB_DATA_DIR}")
+
+    # Add flags specified via the 'DB_EXTRA_FLAGS' environment variable
+    read -r -a db_extra_flags <<< "$(mysql_extra_flags)"
+    [[ "${#db_extra_flags[@]}" -gt 0 ]] && args+=("${db_extra_flags[@]}")
+
+    am_i_root && args=("${args[@]}" "--user=$DB_DAEMON_USER")
+    command="${DB_BIN_DIR}/mysqld"
+    args+=("--initialize-insecure")
+
+    debug_execute "$command" "${args[@]}"
+}
+
+########################
+# Upgrade Database Schema
+# Globals:
+#   DRYCC_DEBUG
+#   DB_*
+# Arguments:
+#   None
+# Returns:
+#   None
+#########################
+mysql_upgrade() {
+    info "Running mysql_upgrade"
+    mysql_stop
+    mysql_start_bg "--upgrade=${DB_UPGRADE}"
 }
 
 ########################
@@ -333,7 +415,11 @@ EOF
         if [[ -z "$DB_REPLICATION_MODE" ]] || [[ "$DB_REPLICATION_MODE" = "master" ]]; then
             if [[ "$DB_REPLICATION_MODE" = "master" ]]; then
                 debug "Starting replication"
-                echo "RESET MASTER;" | debug_execute "$DB_BIN_DIR/mysql" --defaults-file="$DB_CONF_FILE" -N -u root
+                if [[ "$(mysql_get_version)" =~ ^8\.0\. ]]; then
+                    echo "RESET MASTER;" | debug_execute "$DB_BIN_DIR/mysql" --defaults-file="$DB_CONF_FILE" -N -u root
+                else
+                    echo "RESET BINARY LOGS AND GTIDS;" | debug_execute "$DB_BIN_DIR/mysql" --defaults-file="$DB_CONF_FILE" -N -u root
+                fi
             fi
             mysql_ensure_root_user_exists "$DB_ROOT_USER" "$DB_ROOT_PASSWORD" "$DB_AUTHENTICATION_PLUGIN"
             mysql_ensure_user_not_exists "" # ensure unknown user does not exist
@@ -434,7 +520,7 @@ mysql_start_bg() {
     # Do not start as root, to avoid permission issues
     am_i_root && flags+=("--user=${DB_DAEMON_USER}")
 
-    # The slave should only start in 'run.sh', elseways user credentials would be needed for any connection
+    # The replica should only start in 'run.sh', elseways user credentials would be needed for any connection
     flags+=("--skip-replica-start")
     flags+=("$@")
 
@@ -455,7 +541,12 @@ mysql_start_bg() {
     fi
 }
 
+#!/bin/bash
+# Copyright DRYCC Community. All Rights Reserved.
+# SPDX-License-Identifier: APACHE-2.0
+#
 # Library for mysql common
+
 ########################
 # Extract mysql version from version string
 # Globals:
@@ -737,54 +828,6 @@ mysql_stop() {
     fi
 }
 
-########################
-# Initialize database data
-# Globals:
-#   DRYCC_DEBUG
-#   DB_*
-# Arguments:
-#   None
-# Returns:
-#   None
-#########################
-mysql_install_db() {
-    local command="${DB_BIN_DIR}/mysql_install_db"
-    local -a args=("--defaults-file=${DB_CONF_FILE}" "--basedir=${DB_BASE_DIR}" "--datadir=${DB_DATA_DIR}")
-
-    # Add flags specified via the 'DB_EXTRA_FLAGS' environment variable
-    read -r -a db_extra_flags <<< "$(mysql_extra_flags)"
-    [[ "${#db_extra_flags[@]}" -gt 0 ]] && args+=("${db_extra_flags[@]}")
-
-    am_i_root && args=("${args[@]}" "--user=$DB_DAEMON_USER")
-    if [[ "$DB_FLAVOR" = "mariadb" ]]; then
-        args+=("--auth-root-authentication-method=normal")
-        # Feature available only in MariaDB 10.5+
-        # ref: https://mariadb.com/kb/en/mysql_install_db/#not-creating-the-test-database-and-anonymous-user
-        if [[ ! "$(mysql_get_version)" =~ ^10\.[01234]\. ]]; then
-            is_boolean_yes "$DB_SKIP_TEST_DB" && args+=("--skip-test-db")
-        fi
-    else
-        command="${DB_BIN_DIR}/mysqld"
-        args+=("--initialize-insecure")
-    fi
-    debug_execute "$command" "${args[@]}"
-}
-
-########################
-# Upgrade Database Schema
-# Globals:
-#   DRYCC_DEBUG
-#   DB_*
-# Arguments:
-#   None
-# Returns:
-#   None
-#########################
-mysql_upgrade() {
-    info "Running mysql_upgrade"
-    mysql_stop
-    mysql_start_bg "--upgrade=${DB_UPGRADE}"
-}
 
 ########################
 # Migrate old custom configuration files
@@ -963,11 +1006,9 @@ mysql_ensure_root_user_exists() {
 -- create user 'root'@'localhost' $([ "$password" != "" ] && echo "identified by \"$password\"");
 -- grant all on *.* to 'root'@'localhost' with grant option;
 -- create admin user for remote access
-set sql_log_bin=0;
-create user if not exists '$user'@'%' $([ "$password" != "" ] && echo "identified $auth_plugin_str by \"$password\"");
+create user '$user'@'%' $([ "$password" != "" ] && echo "identified $auth_plugin_str by \"$password\"");
 grant all on *.* to '$user'@'%' with grant option;
 flush privileges;
-set sql_log_bin=1;
 EOF
         # Since MariaDB >=10.4, the mysql.user table was replaced with a view: https://mariadb.com/kb/en/mysqluser-table/
         # Views have a definer user, in this case set to 'root', which needs to exist for the view to work
@@ -984,11 +1025,9 @@ EOF
     else
         mysql_execute "mysql" "root" <<EOF
 -- create admin user
-set sql_log_bin=0;
-create user if not exists '$user'@'%' $([ "$password" != "" ] && echo "identified by \"$password\"");
+create user '$user'@'%' $([ "$password" != "" ] && echo "identified by \"$password\"");
 grant all on *.* to '$user'@'%' with grant option;
 flush privileges;
-set sql_log_bin=1;
 EOF
     fi
 }
@@ -1001,7 +1040,7 @@ EOF
 #   $1 - database name
 # Flags:
 #   --character-set - character set
-#   --collate - collation
+#   --collation - collation
 #   --host - database host
 #   --port - database port
 # Returns:
@@ -1309,14 +1348,14 @@ find_jemalloc_lib() {
 ########################
 # Execute a reliable health check against the current mysql instance
 # Globals:
-#   DB_ROOT_PASSWORD, DB_MASTER_ROOT_PASSWORD
+#   DB_ROOT_USER, DB_ROOT_PASSWORD, DB_MASTER_ROOT_PASSWORD
 # Arguments:
 #   None
 # Returns:
 #   mysqladmin output
 #########################
 mysql_healthcheck() {
-    local args=("-uroot" "-h0.0.0.0")
+    local args=("-u${DB_ROOT_USER}" "-h0.0.0.0")
     local root_password
 
     root_password="$(get_master_env_var_value ROOT_PASSWORD)"
@@ -1377,6 +1416,20 @@ mysql_client_extra_opts() {
             value="$(mysql_client_env_value "SSL_${key^^}_FILE")"
             [[ -n "${value}" ]] && opts+=("--ssl-${key}=${value}")
         done
+    else
+        # Skip SSL validation
+        if [[ "$(mysql_client_flavor)" = "mariadb" ]]; then
+            # SSL connections are enabled by default in MariaDB >=10.11
+            local mysql_version=""
+            local major_version=""
+            local minor_version=""
+            mysql_version="$(mysql_get_version)"
+            major_version="$(get_sematic_version "${mysql_version}" 1)"
+            minor_version="$(get_sematic_version "${mysql_version}" 2)"
+            if [[ "${major_version}" -gt 10 ]] || [[ "${major_version}" -eq 10 && "${minor_version}" -eq 11 ]]; then
+                opts+=("--skip-ssl")
+            fi
+        fi
     fi
     echo "${opts[@]:-}"
 }
