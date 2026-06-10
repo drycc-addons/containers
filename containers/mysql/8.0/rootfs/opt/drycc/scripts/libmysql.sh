@@ -26,12 +26,32 @@
 #########################
 mysql_extra_flags() {
     local randNumber
+    local nodeSuffix
+    local randomPrefix
     local -a dbExtraFlags=()
     # shellcheck disable=SC2153
     read -r -a userExtraFlags <<< "$DB_EXTRA_FLAGS"
 
     if [[ -n "$DB_REPLICATION_MODE" ]]; then
-        randNumber="$(head /dev/urandom | tr -dc 0-9 | head -c 3 ; echo '')"
+        # Simplified server-id generation: [random 2-digit] + [hostname_last_digit]
+        # Format: random number from 10-99 concatenated with host suffix digit
+        # Extract numeric suffix (last char) from HOSTNAME: helmbroker-mysql-{1,2,3}
+        nodeSuffix="${HOSTNAME: -1}"
+
+        # Convert last char of hostname suffix, and prevent "xx0" patterns
+        if [[ ! "$nodeSuffix" =~ ^[0-9]$ ]]; then
+            nodeSuffix="1"
+        elif [[ "$nodeSuffix" == "0" ]]; then
+            nodeSuffix="10"  # Replace 0 with unique digit
+        fi
+
+        # Simple way to generate random 2-digit prefix between [10, 99]:
+        # $RANDOM % 90 generates [0, 89], adding 10 gives us exactly the range [10, 99]
+        randomPrefix=$(( ($RANDOM % 90) + 10 ))
+
+        # Combine to form three-digit id for different STS pods like 45{1,2..}
+        randNumber="${randomPrefix}${nodeSuffix}"
+
         dbExtraFlags+=("--server-id=$randNumber" "--log-bin=mysql-bin" "--sync-binlog=1")
         if [[ "$DB_REPLICATION_MODE" = "slave" ]]; then
             dbExtraFlags+=("--relay-log=mysql-relay-bin" "--log-slave-updates=1" "--read-only=1")
