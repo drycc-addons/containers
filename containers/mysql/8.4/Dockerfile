@@ -9,7 +9,13 @@ COPY prebuildfs /
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Install required system packages and dependencies
 
-RUN install-packages ca-certificates curl gcc-12 libcom-err2 libgcc-s1 libgssapi-krb5-2 libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libsasl2-2  libstdc++6 libtinfo6 libtirpc3t64 procps psmisc
+RUN install-packages ca-certificates curl gcc-12 libcom-err2 libgcc-s1 libgssapi-krb5-2 \
+    libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libsasl2-2  libstdc++6 libtinfo6 libtirpc3t64 procps psmisc libjemalloc2
+
+RUN JEMALLOC_PATH=$(find /usr/lib -name "libjemalloc.so.2" | head -n 1) && \
+    mkdir -p /usr/local/lib && \
+    ln -sf ${JEMALLOC_PATH} /usr/local/lib/libjemalloc.so && \
+    ldconfig
 
 RUN mkdir -p /tmp/drycc/pkg/cache/ && cd /tmp/drycc/pkg/cache/ && \
     install-stack mysql $MYSQL_VERSION && \
@@ -26,7 +32,9 @@ RUN mkdir /docker-entrypoint-initdb.d
 
 COPY rootfs /
 RUN /opt/drycc/scripts/mysql/postunpack.sh
-ENV APP_VERSION="8.4.9" \
+
+ENV LD_PRELOAD="/usr/local/lib/libjemalloc.so" \
+    APP_VERSION="8.4.9" \
     DRYCC_APP_NAME="mysql" \
     PATH="/opt/drycc/ini-file/bin:/opt/drycc/mysql/bin:/opt/drycc/mysql/sbin:$PATH"
 
