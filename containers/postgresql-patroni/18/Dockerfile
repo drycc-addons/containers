@@ -3,7 +3,7 @@ FROM registry.drycc.cc/drycc/base:${CODENAME}
 
 ENV PG_MAJOR=18 \
   PG_MINOR=4 \
-  WALG_VERSION="3.0.5" \
+  WALG_VERSION="3.0.7" \
   HOME=/opt/drycc/postgresql 
 ENV PGDATA=$HOME/$PG_MAJOR/data \
   PGHOME=$HOME
